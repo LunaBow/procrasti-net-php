@@ -117,7 +117,7 @@ const languages = {
     de: {
         // Header
         'header-title': 'procrasti-net',
-        'header-subtitle': 'Scheiß drauf, wir kriegen das iwie hin...',
+        'header-subtitle': 'Alles muss, nichts kann!',
 
         // Core Navigation
         'nav-todos': 'To Dos',

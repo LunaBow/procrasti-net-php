@@ -304,8 +304,9 @@ $totalCount = count($tasks);
 
     .category-filter-btn:hover,
     .category-filter-btn.active {
-        background: currentColor;
-        color: white;
+        background: white;
+        color: currentColor;
+        border-color: currentColor;
     }
 
     .section-header {
@@ -439,6 +440,51 @@ $totalCount = count($tasks);
         .category-filters {
             width: 100%;
         }
+
+        .task-stats {
+            gap: 1rem;
+        }
+
+        .stat {
+            min-width: 80px;
+            padding: 0.75rem 1rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .task-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .task-checkbox {
+            align-self: flex-start;
+            margin-top: 0.25rem;
+        }
+
+        .task-delete {
+            align-self: flex-end;
+            margin-top: -0.5rem;
+        }
+
+        .task-controls {
+            padding: 1rem;
+        }
+
+        .category-filters {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .category-filter-btn {
+            width: 100%;
+            text-align: center;
+        }
     }
 </style>
 
@@ -501,6 +547,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
+    }
+
+    // Task toggle AJAX
+    document.querySelectorAll('.task-toggle-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Toggle UI
+                const taskItem = this.closest('.task-item');
+                const checkbox = this.querySelector('.task-checkbox');
+                const isDone = taskItem.classList.contains('done');
+                if (isDone) {
+                    taskItem.classList.remove('done');
+                    checkbox.textContent = '⬜';
+                    taskItem.dataset.status = 'todo';
+                } else {
+                    taskItem.classList.add('done');
+                    checkbox.textContent = '✅';
+                    taskItem.dataset.status = 'done';
+                }
+                updateStats();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+
+    function updateStats() {
+        const todoCount = document.querySelectorAll('.task-item:not(.done)').length;
+        const doneCount = document.querySelectorAll('.task-item.done').length;
+        const totalCount = document.querySelectorAll('.task-item').length;
+        const statValues = document.querySelectorAll('.stat-value');
+        statValues[0].textContent = todoCount;
+        statValues[1].textContent = doneCount;
+        statValues[2].textContent = totalCount;
     }
 });
 </script>

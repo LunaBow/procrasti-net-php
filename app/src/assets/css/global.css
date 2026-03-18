@@ -205,12 +205,13 @@ header h2 {
 
 .nav-stack {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
-.nav-core, .nav-extra {
+.nav-core {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -220,6 +221,34 @@ header h2 {
   border-radius: 999px;
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
+}
+
+.nav-extra {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  padding: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translateX(90%);
+  transition: all 0.3s ease;
+  pointer-events: auto;
+}
+
+.nav-extra:hover {
+  transform: translateX(0);
+}
+
+.nav-stack:hover .nav-extra {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .dropdown-wrapper {

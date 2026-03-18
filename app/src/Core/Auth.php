@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Core;
 
 final class Auth {
-    // Boilerplate to make sure sessions are running before we try to use them.
+    // Boilerplate to make sure sessions are running before we use them.
     public static function start(): void {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
@@ -20,7 +20,7 @@ final class Auth {
     // Handles the actual login process by saving their ID to the session.
     public static function login(int $uid): void {
         self::start();
-        // Regenerate the ID to prevent session fixation attacks. (Security point!)
+        // Regenerate the ID to prevent session fixation attacks.
         session_regenerate_id(true);
         $_SESSION['uid'] = $uid;
     }
