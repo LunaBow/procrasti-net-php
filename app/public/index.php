@@ -80,7 +80,7 @@ try {
         // If no primary key and there are duplicate user_ids, fix it
         if (!$hasPrimaryKey) {
             // Check for duplicates
-            $dupeCheck = $pdo->query("SELECT user_id, COUNT(*) as cnt FROM user_settings GROUP BY user_id HAVING cnt > 1");
+            $dupeCheck = $pdo->query("SELECT user_id, COUNT(*) as cnt FROM user_settings GROUP BY user_settings.user_id HAVING cnt > 1");
             if ($dupeCheck->rowCount() > 0) {
                 // We have duplicates and no primary key - need to clean this up
                 // Create backup, keep only latest per user
@@ -189,7 +189,6 @@ switch ($page) {
     case 'tasks': $tasks->index(); break;
     case 'task_create': $tasks->create(); break;
     case 'task_toggle': $tasks->toggle(); break;
-    case 'task_delete': $tasks->delete(); break;
 
     case 'categories': $categories->index(); break;
     case 'skills': $skills->index(); break;

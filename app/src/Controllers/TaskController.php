@@ -20,9 +20,6 @@ final class TaskController {
         
         // Load all the tasks for this user so they can see what they are ignoring today
         $tasks = $this->repo->allByUser($userId);
-        
-        // Load categories for the form
-        $categories = (new \Repos\CategoryRepo($this->repo->pdo()))->all();
 
         // Load settings to check for Privacy Mode
         $settings = [];
@@ -32,7 +29,6 @@ final class TaskController {
         
         render('tasks', [
             'tasks' => $tasks,
-            'categories' => $categories,
             'settings' => $settings
         ]);
     }
@@ -46,10 +42,12 @@ final class TaskController {
             
             $title = $_POST['title'] ?? '';
             $categoryId = isset($_POST['category_id']) && $_POST['category_id'] !== '' ? (int)$_POST['category_id'] : null;
+            $dueDate = isset($_POST['due_date']) && $_POST['due_date'] !== '' ? $_POST['due_date'] : null;
+            $reminderAt = isset($_POST['reminder_at']) && $_POST['reminder_at'] !== '' ? $_POST['reminder_at'] : null;
 
             if ($title) {
                 // Chuck it in the DB
-                $this->repo->create(Auth::userId(), $title, $categoryId);
+                $this->repo->create(Auth::userId(), $title, $categoryId, $dueDate, $reminderAt);
             }
         }
         // Send them back to the list
@@ -78,31 +76,6 @@ final class TaskController {
         }
         
         // Fallback for browsers without JS (or if they hit enter on a form)
-        header('Location: ?page=tasks');
-        exit;
-    }
-
-    public function delete(): void {
-        Auth::requireLogin();
-
-        // Verify CSRF before deleting to stop attackers from deleting your shit
-        Csrf::verify($_POST['csrf'] ?? null);
-
-        $taskId = (int)($_POST['id'] ?? 0);
-
-        if ($taskId > 0) {
-            // Delete the task from the DB
-            $result = $this->repo->delete(Auth::userId(), $taskId);
-
-            // If JS called this via fetch(), send back JSON
-            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => $result, 'id' => $taskId]);
-                exit;
-            }
-        }
-
-        // Fallback for browsers without JS
         header('Location: ?page=tasks');
         exit;
     }
