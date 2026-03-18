@@ -41,7 +41,9 @@ try {
             $pdo->exec($setupSql);
         }
     }
-} catch (\Throwable $e) {}
+} catch (\Throwable $e) {
+    error_log($e->getMessage());
+}
 
 try {
     // Run the main settings table setup
@@ -64,7 +66,9 @@ try {
             }
         }
     }
-} catch (\Throwable $e) {}
+} catch (\Throwable $e) {
+    error_log($e->getMessage());
+}
 
 // start session so we know who's logged in.
 Auth::start();
