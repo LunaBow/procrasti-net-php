@@ -2,6 +2,14 @@ CREATE TABLE IF NOT EXISTS `user_settings` (
   `user_id` bigint(20) UNSIGNED NOT NULL,
   `allow_gamification` tinyint(1) NOT NULL DEFAULT 1,
   `privacy_mode` tinyint(1) NOT NULL DEFAULT 0,
+  `sarcastic_comments` tinyint(1) NOT NULL DEFAULT 0,
+  `hand_drawn_mode` tinyint(1) NOT NULL DEFAULT 0,
+  `leet_speak` tinyint(1) NOT NULL DEFAULT 0,
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `user_settings`
+ADD COLUMN IF NOT EXISTS `sarcastic_comments` tinyint(1) NOT NULL DEFAULT 0,
+ADD COLUMN IF NOT EXISTS `hand_drawn_mode` tinyint(1) NOT NULL DEFAULT 0,
+ADD COLUMN IF NOT EXISTS `leet_speak` tinyint(1) NOT NULL DEFAULT 0;

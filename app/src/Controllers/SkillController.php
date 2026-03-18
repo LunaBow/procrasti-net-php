@@ -11,13 +11,15 @@ final class SkillController {
 
     public function index(): void {
         $categoryId = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
+        $category = null;
+        
         if ($categoryId) {
             $skills = $this->repo->byCategory($categoryId);
             $category = (new CategoryRepo($this->repo->pdo()))->find($categoryId);
         } else {
             $skills = $this->repo->all();
         }
-        $content = __DIR__ . '/../Views/skills.php';
-        require __DIR__ . '/../Views/layout.php';
+        
+        render('skills', ['skills' => $skills, 'category' => $category]);
     }
 }

@@ -8,8 +8,8 @@ $globalSettings = $globalSettings ?? [];
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= htmlspecialchars($title) ?></title>
-    <!-- Use absolute paths from the domain root to ensure they load -->
-    <link rel="stylesheet" href="/app/src/assets/css/global.css">
+    <!-- Use relative paths or dynamically echo the correct base path -->
+    <link rel="stylesheet" href="../src/assets/css/global.css">
     
     <!-- Apply theme early to prevent flashbang -->
     <script>
@@ -122,7 +122,7 @@ $globalSettings = $globalSettings ?? [];
     </section>
 </div>
 
-<script src="/app/src/assets/js/languages.js"></script>
-<script src="/app/src/assets/js/app.js" defer></script>
+<script src="../src/assets/js/languages.js"></script>
+<script src="../src/assets/js/app.js" defer></script>
 </body>
 </html>

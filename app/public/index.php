@@ -34,9 +34,12 @@ $pdo = $db->pdo();
 
 // Just making sure the habit tables exist if they don't already. 
 try {
-    $setupSql = file_get_contents(__DIR__ . '/../src/db/habits_setup.sql');
-    if ($setupSql) {
-        $pdo->exec($setupSql);
+    $habitSetupFile = __DIR__ . '/../src/db/habits_setup.sql';
+    if (file_exists($habitSetupFile)) {
+        $setupSql = file_get_contents($habitSetupFile);
+        if ($setupSql) {
+            $pdo->exec($setupSql);
+        }
     }
 } catch (\Throwable $e) {}
 

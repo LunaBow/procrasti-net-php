@@ -10,7 +10,7 @@ final class CategoryController {
 
     public function index(): void {
         $categories = $this->repo->all();
-        $content = __DIR__ . '/../Views/categories.php';
-        require __DIR__ . '/../Views/layout.php';
+        // Use the global render function instead of manual requires!
+        render('categories', ['categories' => $categories]);
     }
 }
