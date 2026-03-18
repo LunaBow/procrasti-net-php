@@ -65,7 +65,7 @@ $globalSettings = $globalSettings ?? [];
                 <div class="dropdown-wrapper"><a id="triggerSkills" href="?page=skills" data-lang="nav-skills">Skills</a></div>
                 <div class="dropdown-wrapper"><a id="triggerHabits" href="?page=habits" data-lang="nav-habits">Habits</a></div>
                 <div class="dropdown-wrapper"><a id="triggerPlanner" href="?page=planner" data-lang="nav-planner">Planner</a></div>
-                <div class="dropdown-wrapper"><a id="triggerCalendar" href="?page=calendar" data-lang="nav-planner">Calendar</a></div>
+                <div class="dropdown-wrapper"><a id="triggerCalendar" href="?page=calendar" data-lang="nav-calendar">Calendar</a></div>
                 <div class="dropdown-wrapper"><a id="triggerSettings" href="?page=settings" data-lang="nav-settings">Settings</a></div>
                 <?php if (Core\Auth::userId()): ?>
                     <div class="dropdown-wrapper"><a href="?page=logout" style="color: var(--accent);" data-lang="nav-logout">Logout</a></div>

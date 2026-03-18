@@ -44,6 +44,7 @@ function applyClientFeatures() {
                 "Don't worry, those tasks will eventually do themselves. Or not.",
                 "I'm not saying you're a procrastinator, but I'm not not saying it either.",
                 "Are you trying to set a new record for overdue tasks?",
+                "If you keep it up, the world might end before you achieve what you set out to do. Takes a lot of pressure, huh?"
             ];
             const randomIndex = Math.floor(Math.random() * sarcasticMessages.length);
             const message = sarcasticMessages[randomIndex];
