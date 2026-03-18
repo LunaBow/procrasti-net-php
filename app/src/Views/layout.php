@@ -1,5 +1,5 @@
 <?php
-$title = $title ?? 'Procrasti-php';
+$title = $title ?? 'Procrastinate-php';
 $globalSettings = $globalSettings ?? [];
 ?>
 <!doctype html>
@@ -11,10 +11,10 @@ $globalSettings = $globalSettings ?? [];
     <!-- Use relative paths or dynamically echo the correct base path -->
     <link rel="stylesheet" href="../src/assets/css/global.css">
     
-    <!-- Apply theme early to prevent flashbang -->
+    <!-- Apply theme early to prevent flash of unstyled content -->
     <script>
         (function() {
-            var theme = localStorage.getItem('theme');
+            const theme = localStorage.getItem('theme');
             if (theme) {
                 if (theme === 'dark') {
                     document.documentElement.classList.add('pastel-mode');
@@ -33,7 +33,7 @@ $globalSettings = $globalSettings ?? [];
 <div id="entireContentWrapper">
     <header id="headerHeading">
         <div class="container">
-            <h1><a href="?page=tasks" data-lang="header-title">procrasti-net</a></h1>
+            <h1><a href="?page=tasks" data-lang="header-title">procrastinate-net</a></h1>
             <h2 data-lang="header-subtitle">Fuck it, we ball.</h2>
             <div id="controls">
                 <div id="theme-switcher">
@@ -116,7 +116,11 @@ $globalSettings = $globalSettings ?? [];
                 </div>
             <?php endif; ?>
             
-            <?php include $content; ?>
+            <?php if (isset($content) && file_exists($content)): ?>
+                <?php include $content; ?>
+            <?php else: ?>
+                <p>Content not available.</p>
+            <?php endif; ?>
         </main>
     </div>
 
@@ -124,7 +128,7 @@ $globalSettings = $globalSettings ?? [];
         <footer>
             <div class="footer-site-footercontainer">
                 <div class="footer-about">
-                    <p><strong data-lang="footer-about-title">Procrasti-net</strong></p>
+                    <p><strong data-lang="footer-about-title">Procrastinate-net</strong></p>
                     <p data-lang="footer-about-p1">We're here to do tasks and chew bubblegum. And we have a lot of bubble gum.</p>
                     <p data-lang="footer-about-p2">Build for Luna and Verena, may they stop procrastinating and start working on shit.</p>
                 </div>
