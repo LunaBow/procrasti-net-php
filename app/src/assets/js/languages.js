@@ -13,6 +13,7 @@ const languages = {
         'nav-settings': 'Settings',
         'nav-logout': 'Logout',
         'nav-login': 'Login',
+        'nav-extra': 'Extra',
 
         // Extra Navigation
         'nav-reality-check': 'Reality Check',
@@ -23,6 +24,14 @@ const languages = {
         'nav-multimedia': 'Multimedia',
         'nav-literary-collection': 'Literary Collection',
         'nav-the-gang': 'The Gang (sheesh)',
+        'nav-mindtools-reality-check': 'MindTools Reality Check',
+        'nav-productivityist-bare-minimum': 'Productivityist Bare Minimum',
+        'nav-headspace-mindfulness': 'Headspace Mindfulness',
+        'nav-newgrounds-games': 'Newgrounds Games',
+        'nav-deviantart-gallery': 'DeviantArt Gallery',
+        'nav-youtube-videos': 'YouTube Videos',
+        'nav-gutenberg-books': 'Project Gutenberg Books',
+        'nav-reddit-community': 'Reddit Community',
 
         // Footer
         'footer-about-title': 'Procrasti-net',
@@ -128,6 +137,7 @@ const languages = {
         'nav-settings': 'Einstellungen',
         'nav-logout': 'Abmelden',
         'nav-login': 'Anmelden',
+        'nav-extra': 'Extra',
 
         // Extra Navigation
         'nav-reality-check': 'Realitäts-Check',
@@ -138,6 +148,14 @@ const languages = {
         'nav-multimedia': 'Multimedia',
         'nav-literary-collection': 'Literarische Sammlung',
         'nav-the-gang': 'Die Gang (sheesh)',
+        'nav-mindtools-reality-check': 'MindTools Realitäts-Check',
+        'nav-productivityist-bare-minimum': 'Productivityist Bare Minimum',
+        'nav-headspace-mindfulness': 'Headspace Achtsamkeit',
+        'nav-newgrounds-games': 'Newgrounds Spiele',
+        'nav-deviantart-gallery': 'DeviantArt Galerie',
+        'nav-youtube-videos': 'YouTube Videos',
+        'nav-gutenberg-books': 'Project Gutenberg Bücher',
+        'nav-reddit-community': 'Reddit Community',
 
         // Footer
         'footer-about-title': 'Procrasti-net',
@@ -230,5 +248,3 @@ const languages = {
         'empty-state': 'Hier ist noch nichts.',
     }
 };
-
-

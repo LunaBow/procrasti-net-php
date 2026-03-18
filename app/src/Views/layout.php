@@ -63,29 +63,29 @@ $globalSettings = $globalSettings ?? [];
                     <div class="dropdown-wrapper"><a href="?page=login" style="color: var(--primary);" data-lang="nav-login">Login</a></div>
                 <?php endif; ?>
             </nav>
-
-            <!-- Row 2: old stuff from other frontend yippie -->
-            <nav class="nav-extra" aria-label="Extra navigation">
-                <div class="dropdown-wrapper">
-                    <a id="triggerEvaluation" class="dropbtn" href="#" data-lang="nav-reality-check">Reality Check</a>
-                    <div class="dropdown-content">
-                        <a id="triggerRequired" href="#" data-lang="nav-bare-minimum">Bare Minimum Tasks</a>
-                        <a id="triggerBoot" href="#" data-lang="nav-emergency-reboot">Emergency Reboot</a>
-                    </div>
-                </div>
-                <div class="dropdown-wrapper">
-                    <a id="triggerArt" class="dropbtn" href="#" data-lang="nav-dissociation-arcade">Dissociation Arcade</a>
-                    <div class="dropdown-content">
-                        <a id="showDrawingsOnly" href="#" data-lang="nav-visual-gallery">Visual Gallery</a>
-                        <a id="showAVOnly" href="#" data-lang="nav-multimedia">Multimedia</a>
-                        <a id="showBooksOnly" href="#" data-lang="nav-literary-collection">Literary Collection</a>
-                    </div>
-                </div>
-                <div class="dropdown-wrapper">
-                    <a id="TriggerMember" class="dropbtn" href="#" data-lang="nav-the-gang">The Gang (sheesh)</a>
-                </div>
-            </nav>
         </div>
+
+        <!-- Extra Navigation Slide-out Menu -->
+        <nav class="nav-extra-menu" aria-label="Extra navigation">
+            <div class="dropdown-wrapper">
+                <a id="triggerEvaluation" class="dropbtn" href="https://www.mindtools.com/pages/main/newMN_80.htm" data-lang="nav-mindtools-reality-check">MindTools Reality Check</a>
+                <div class="dropdown-content">
+                    <a id="triggerRequired" href="https://www.productivityist.com/bare-minimum-tasks/" data-lang="nav-productivityist-bare-minimum">Productivityist Bare Minimum</a>
+                    <a id="triggerBoot" href="https://www.headspace.com/" data-lang="nav-headspace-mindfulness">Headspace Mindfulness</a>
+                </div>
+            </div>
+            <div class="dropdown-wrapper">
+                <a id="triggerArt" class="dropbtn" href="https://www.newgrounds.com/" data-lang="nav-newgrounds-games">Newgrounds Games</a>
+                <div class="dropdown-content">
+                    <a id="showDrawingsOnly" href="https://www.deviantart.com/" data-lang="nav-deviantart-gallery">DeviantArt Gallery</a>
+                    <a id="showAVOnly" href="https://www.youtube.com/" data-lang="nav-youtube-videos">YouTube Videos</a>
+                    <a id="showBooksOnly" href="https://www.gutenberg.org/" data-lang="nav-gutenberg-books">Project Gutenberg Books</a>
+                </div>
+            </div>
+            <div class="dropdown-wrapper">
+                <a id="TriggerMember" class="dropbtn" href="https://www.reddit.com/" data-lang="nav-reddit-community">Reddit Community</a>
+            </div>
+        </nav>
     </section>
 
     <div id="JoinContent" style="display: block;">

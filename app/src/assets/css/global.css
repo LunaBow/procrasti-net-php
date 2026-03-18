@@ -96,7 +96,7 @@ a:hover {
 
 /* Hand-Drawn Specific Tweaks */
 html.hand-drawn-mode .nav-core,
-html.hand-drawn-mode .nav-extra,
+html.hand-drawn-mode .nav-extra-menu,
 html.hand-drawn-mode .card,
 html.hand-drawn-mode .content,
 html.hand-drawn-mode input,
@@ -205,10 +205,8 @@ header h2 {
 
 .nav-stack {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  position: relative;
 }
 
 .nav-core {
@@ -223,32 +221,26 @@ header h2 {
   box-shadow: var(--shadow-sm);
 }
 
-.nav-extra {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  background: var(--surface);
-  padding: 0.5rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  position: absolute;
-  right: 0;
+.nav-extra-menu {
+  position: fixed;
   top: 0;
-  transform: translateX(90%);
-  transition: all 0.3s ease;
-  pointer-events: auto;
+  right: -260px;
+  width: 280px;
+  height: 100vh;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: right 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
 }
 
-.nav-extra:hover {
-  transform: translateX(0);
-}
-
-.nav-stack:hover .nav-extra {
-  transform: translateX(0);
-  opacity: 1;
-  pointer-events: auto;
+.nav-extra-menu:hover {
+  right: 0;
 }
 
 .dropdown-wrapper {
