@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="077c2a48-20f7-48c2-adfa-b62dd7a00dfb" name="phpnet" url="https://mt231043-22290.php.ustp.cloud/">
+        <fileTransfer accessType="SFTP" host="php.ustp.cloud" port="22" sshConfigId="411bb62b-e7f7-4a3b-8e6a-a1a4c937e6bb" sshConfig="php-mt231043-22290@php.ustp.cloud:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

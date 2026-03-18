@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="php.ustp.cloud" id="411bb62b-e7f7-4a3b-8e6a-a1a4c937e6bb" port="22" nameFormat="DESCRIPTIVE" username="php-mt231043-22290" useOpenSSHConfig="true" />
+    </configs>
+  </component>
+</project>
