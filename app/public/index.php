@@ -189,6 +189,7 @@ switch ($page) {
     case 'tasks': $tasks->index(); break;
     case 'task_create': $tasks->create(); break;
     case 'task_toggle': $tasks->toggle(); break;
+    case 'task_delete': $tasks->delete(); break;
 
     case 'categories': $categories->index(); break;
     case 'skills': $skills->index(); break;

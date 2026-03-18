@@ -1,32 +1,8 @@
 <?php 
-// If they have privacy mode on, we'll blur the text until they hover over it
 $isPrivacyMode = ($settings['privacy_mode'] ?? 0) == 1;
-$title = 'My Tasks'; 
+$title = 'My Tasks';
 
-// Group tasks by category
-$tasksByCategory = [];
-$uncategorizedTasks = [];
-
-foreach ($tasks as $task) {
-    // Handle both simple and full query results
-    $categoryId = $task['category_id'] ?? null;
-    $categoryName = $task['category_name'] ?? 'Uncategorized';
-    $categoryColor = $task['color_code'] ?? '#666';
-
-    if ($categoryId) {
-        if (!isset($tasksByCategory[$categoryName])) {
-            $tasksByCategory[$categoryName] = [
-                'color' => $categoryColor,
-                'tasks' => []
-            ];
-        }
-        $tasksByCategory[$categoryName]['tasks'][] = $task;
-    } else {
-        $uncategorizedTasks[] = $task;
-    }
-}
-
-// Get categories for the form
+// Get categories
 $categories = [
     ['id' => 1, 'name' => 'Focus', 'color_code' => '#4a5d50'],
     ['id' => 2, 'name' => 'Planning', 'color_code' => '#d68f7a'],
@@ -40,240 +16,491 @@ $categories = [
     ['id' => 10, 'name' => 'Life', 'color_code' => '#99cc33'],
     ['id' => 11, 'name' => 'Work', 'color_code' => '#cc3300'],
 ];
+
+// Sort tasks by due date
+usort($tasks, function($a, $b) {
+    $aDate = strtotime($a['due_at'] ?? $a['created_at']);
+    $bDate = strtotime($b['due_at'] ?? $b['created_at']);
+    return $aDate - $bDate;
+});
+
+// Group by category
+$tasksByCategory = [];
+$uncategorizedTasks = [];
+
+foreach ($tasks as $task) {
+    $categoryId = $task['category_id'] ?? null;
+    $categoryName = $task['category_name'] ?? 'Uncategorized';
+    $categoryColor = $task['color_code'] ?? '#666';
+
+    if ($categoryId) {
+        if (!isset($tasksByCategory[$categoryName])) {
+            $tasksByCategory[$categoryName] = [
+                'id' => $categoryId,
+                'color' => $categoryColor,
+                'tasks' => []
+            ];
+        }
+        $tasksByCategory[$categoryName]['tasks'][] = $task;
+    } else {
+        $uncategorizedTasks[] = $task;
+    }
+}
+
+// Count stats
+$todoCount = count(array_filter($tasks, fn($t) => ($t['status'] ?? '') === 'todo'));
+$doneCount = count(array_filter($tasks, fn($t) => ($t['status'] ?? '') === 'done'));
+$totalCount = count($tasks);
 ?>
 
 <div class="content">
-    <h1 data-lang="page-title-tasks">Today's Tasks</h1>
-    <p class="muted" data-lang="page-subtitle-tasks">What's the next stupid easy step?</p>
+    <h1>Today's Tasks</h1>
+    <p class="muted">What's the next stupid easy step?</p>
 
-    <form class="controls" method="post" action="?page=task_create" style="background: var(--surface-alt); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 2rem; overflow: hidden;">
+    <!-- Stats Bar -->
+    <div class="task-stats">
+        <div class="stat">
+            <span class="stat-value"><?= $todoCount ?></span>
+            <span class="stat-label">To Do</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value"><?= $doneCount ?></span>
+            <span class="stat-label">Done</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value"><?= $totalCount ?></span>
+            <span class="stat-label">Total</span>
+        </div>
+    </div>
+
+    <!-- Create Task Form -->
+    <form class="task-form" method="post" action="?page=task_create">
         <input type="hidden" name="csrf" value="<?= e(Core\Csrf::token()) ?>">
 
-        <div class="task-form-grid">
-            <div class="field">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Task Title</label>
-                <input type="text" name="title" class="item" placeholder="e.g. Open the document..." required>
+        <div class="task-form-row">
+            <div class="field field-title">
+                <label>Task Title</label>
+                <input type="text" name="title" placeholder="e.g. Open the document..." required>
             </div>
-
-            <div class="field">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Category</label>
-                <select name="category_id" style="background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.6rem; border-radius: var(--radius-sm); font-family: 'JetBrains Mono', monospace; width: 100%; min-width: 120px;">
+            <div class="field field-category">
+                <label>Category</label>
+                <select name="category_id">
                     <option value="">No Category</option>
-                    <?php foreach ($categories as $category): ?>
-                        <option value="<?= $category['id'] ?>" style="color: <?= e($category['color_code']) ?>;">
-                            <?= e($category['name']) ?>
-                        </option>
+                    <?php foreach ($categories as $cat): ?>
+                        <option value="<?= $cat['id'] ?>"><?= e($cat['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
+        </div>
 
-            <div class="field">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Due Date</label>
-                <input type="date" name="due_date" style="background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.6rem; border-radius: var(--radius-sm); font-family: 'JetBrains Mono', monospace; width: 100%;">
+        <div class="task-form-row">
+            <div class="field field-date">
+                <label>Due Date</label>
+                <input type="date" name="due_date">
             </div>
-
-            <div class="field">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Reminder</label>
-                <input type="datetime-local" name="reminder_at" style="background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.6rem; border-radius: var(--radius-sm); font-family: 'JetBrains Mono', monospace; width: 100%;">
+            <div class="field field-reminder">
+                <label>Reminder</label>
+                <input type="datetime-local" name="reminder_at">
             </div>
         </div>
 
-        <button type="submit" class="pill" style="margin-top: 1rem; width: 100%;">Add Task</button>
+        <button type="submit" class="pill">Add Task</button>
     </form>
 
+    <!-- Filter & Sort Controls -->
+    <div class="task-controls">
+        <div class="control-group">
+            <label>Filter:</label>
+            <div class="category-filters">
+                <?php foreach ($tasksByCategory as $catName => $catData): ?>
+                    <button type="button" class="category-filter-btn" data-category="<?= htmlspecialchars($catName) ?>" style="border-color: <?= $catData['color'] ?>; color: <?= $catData['color'] ?>;">
+                        <?= e($catName) ?>
+                    </button>
+                <?php endforeach; ?>
+                <button type="button" class="category-filter-btn" data-category="show-all">Show All</button>
+                <button type="button" class="category-filter-btn" data-category="hide-completed">Hide Done</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>Sort by:</label>
+            <select id="sort-select">
+                <option value="due-date">Due Date</option>
+                <option value="created">Created</option>
+                <option value="category">Category</option>
+                <option value="status">Status</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Tasks Display -->
     <?php if (empty($tasks)): ?>
         <div class="empty">No tasks for today. Have a rest or start a tiny habit!</div>
     <?php else: ?>
-        <!-- Uncategorized tasks -->
+        <!-- Uncategorized Tasks -->
         <?php if (!empty($uncategorizedTasks)): ?>
-            <div class="task-section">
-                <h3 style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1rem;">Uncategorized</h3>
-                <ul class="todo-list" style="list-style: none; padding: 0;">
-                    <?php foreach ($uncategorizedTasks as $t): ?>
-                        <li class="todo-item <?= (($t['status'] ?? '') === 'done') ? 'done' : '' ?>" data-id="<?= (int)$t['id'] ?>">
-                            <button class="toggleBtn" type="button" data-csrf="<?= e(Core\Csrf::token()) ?>" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;" data-lang="btn-toggle-task">
-                                <?= (($t['status'] ?? '') === 'done') ? '✅' : '⬜' ?>
-                            </button>
-                            <div style="flex: 1;">
-                                <span class="title <?= $isPrivacyMode ? 'privacy-blur' : '' ?>" style="transition: filter 0.2s ease;">
-                                    <?= e((string)$t['title']) ?>
+            <div class="task-section" data-category="Uncategorized">
+                <div class="section-header">
+                    <h3>Uncategorized</h3>
+                    <span class="task-count"><?= count($uncategorizedTasks) ?></span>
+                </div>
+                <div class="task-list">
+                    <?php foreach ($uncategorizedTasks as $task): ?>
+                        <div class="task-item <?= ($task['status'] ?? '') === 'done' ? 'done' : '' ?>" data-task-id="<?= (int)$task['id'] ?>" data-status="<?= $task['status'] ?? 'todo' ?>">
+                            <form method="post" action="?page=task_toggle" class="task-toggle-form" style="display: contents;">
+                                <input type="hidden" name="csrf" value="<?= e(Core\Csrf::token()) ?>">
+                                <input type="hidden" name="id" value="<?= (int)$task['id'] ?>">
+                                <button type="submit" class="task-checkbox">
+                                    <?= ($task['status'] ?? '') === 'done' ? '✅' : '⬜' ?>
+                                </button>
+                            </form>
+                            <div class="task-content">
+                                <span class="task-title <?= $isPrivacyMode ? 'privacy-blur' : '' ?>">
+                                    <?= e((string)$task['title']) ?>
                                 </span>
-                                <?php if ($t['due_at']): ?>
-                                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">
-                                        Due: <?= date('M j, Y', strtotime($t['due_at'])) ?>
-                                    </div>
+                                <?php if ($task['due_at']): ?>
+                                    <div class="task-meta">📅 <?= date('M j, Y', strtotime($task['due_at'])) ?></div>
                                 <?php endif; ?>
-                                <?php if ($t['reminder_at']): ?>
-                                    <div style="font-size: 0.8rem; color: var(--accent); margin-top: 0.25rem;">
-                                        🔔 Reminder: <?= date('M j, Y H:i', strtotime($t['reminder_at'])) ?>
-                                    </div>
+                                <?php if ($task['reminder_at']): ?>
+                                    <div class="task-meta">🔔 <?= date('M j H:i', strtotime($task['reminder_at'])) ?></div>
                                 <?php endif; ?>
                             </div>
-                        </li>
+                            <form method="post" action="?page=task_delete" class="task-delete-form" style="display: contents;" onsubmit="return confirm('Delete this task?');">
+                                <input type="hidden" name="csrf" value="<?= e(Core\Csrf::token()) ?>">
+                                <input type="hidden" name="id" value="<?= (int)$task['id'] ?>">
+                                <button type="submit" class="task-delete" title="Delete task">✕</button>
+                            </form>
+                        </div>
                     <?php endforeach; ?>
-                </ul>
+                </div>
             </div>
         <?php endif; ?>
 
-        <!-- Categorized tasks -->
+        <!-- Categorized Tasks -->
         <?php foreach ($tasksByCategory as $categoryName => $categoryData): ?>
-            <div class="task-section" style="margin-top: 2rem;">
-                <h3 style="color: <?= e($categoryData['color']) ?>; font-size: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <span style="width: 12px; height: 12px; background: <?= e($categoryData['color']) ?>; border-radius: 50%;"></span>
-                    <?= e($categoryName) ?>
-                </h3>
-                <ul class="todo-list" style="list-style: none; padding: 0;">
-                    <?php foreach ($categoryData['tasks'] as $t): ?>
-                        <li class="todo-item <?= (($t['status'] ?? '') === 'done') ? 'done' : '' ?>" data-id="<?= (int)$t['id'] ?>">
-                            <button class="toggleBtn" type="button" data-csrf="<?= e(Core\Csrf::token()) ?>" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;" data-lang="btn-toggle-task">
-                                <?= (($t['status'] ?? '') === 'done') ? '✅' : '⬜' ?>
-                            </button>
-                            <div style="flex: 1;">
-                                <span class="title <?= $isPrivacyMode ? 'privacy-blur' : '' ?>" style="transition: filter 0.2s ease;">
-                                    <?= e((string)$t['title']) ?>
+            <div class="task-section" data-category="<?= htmlspecialchars($categoryName) ?>">
+                <div class="section-header" style="border-left: 4px solid <?= $categoryData['color'] ?>;">
+                    <h3 style="color: <?= $categoryData['color'] ?>;">
+                        <span class="category-dot" style="background: <?= $categoryData['color'] ?>;"></span>
+                        <?= e($categoryName) ?>
+                    </h3>
+                    <span class="task-count"><?= count($categoryData['tasks']) ?></span>
+                </div>
+                <div class="task-list">
+                    <?php foreach ($categoryData['tasks'] as $task): ?>
+                        <div class="task-item <?= ($task['status'] ?? '') === 'done' ? 'done' : '' ?>" data-task-id="<?= (int)$task['id'] ?>" data-status="<?= $task['status'] ?? 'todo' ?>" data-category="<?= htmlspecialchars($categoryName) ?>">
+                            <form method="post" action="?page=task_toggle" class="task-toggle-form" style="display: contents;">
+                                <input type="hidden" name="csrf" value="<?= e(Core\Csrf::token()) ?>">
+                                <input type="hidden" name="id" value="<?= (int)$task['id'] ?>">
+                                <button type="submit" class="task-checkbox">
+                                    <?= ($task['status'] ?? '') === 'done' ? '✅' : '⬜' ?>
+                                </button>
+                            </form>
+                            <div class="task-content">
+                                <span class="task-title <?= $isPrivacyMode ? 'privacy-blur' : '' ?>">
+                                    <?= e((string)$task['title']) ?>
                                 </span>
-                                <?php if ($t['due_at']): ?>
-                                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">
-                                        Due: <?= date('M j, Y', strtotime($t['due_at'])) ?>
-                                    </div>
+                                <?php if ($task['due_at']): ?>
+                                    <div class="task-meta">📅 <?= date('M j, Y', strtotime($task['due_at'])) ?></div>
                                 <?php endif; ?>
-                                <?php if ($t['reminder_at']): ?>
-                                    <div style="font-size: 0.8rem; color: var(--accent); margin-top: 0.25rem;">
-                                        🔔 Reminder: <?= date('M j, Y H:i', strtotime($t['reminder_at'])) ?>
-                                    </div>
+                                <?php if ($task['reminder_at']): ?>
+                                    <div class="task-meta">🔔 <?= date('M j H:i', strtotime($task['reminder_at'])) ?></div>
                                 <?php endif; ?>
                             </div>
-                        </li>
+                            <form method="post" action="?page=task_delete" class="task-delete-form" style="display: contents;" onsubmit="return confirm('Delete this task?');">
+                                <input type="hidden" name="csrf" value="<?= e(Core\Csrf::token()) ?>">
+                                <input type="hidden" name="id" value="<?= (int)$task['id'] ?>">
+                                <button type="submit" class="task-delete" title="Delete task">✕</button>
+                            </form>
+                        </div>
                     <?php endforeach; ?>
-                </ul>
+                </div>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
 </div>
 
 <style>
-    /* If privacy mode is on, blur tasks so shoulder-surfers can't read them */
+    .task-stats {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: var(--surface-alt);
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        min-width: 100px;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .task-form {
+        background: var(--surface-alt);
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        margin-bottom: 2rem;
+    }
+
+    .task-controls {
+        background: var(--surface-alt);
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .control-group {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .control-group label {
+        font-weight: 600;
+        color: var(--text);
+        white-space: nowrap;
+    }
+
+    .category-filters {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .category-filter-btn {
+        padding: 0.4rem 0.8rem;
+        border: 2px solid;
+        border-radius: 999px;
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .category-filter-btn:hover,
+    .category-filter-btn.active {
+        background: currentColor;
+        color: white;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--border);
+    }
+
+    .section-header h3 {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .category-dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    .task-count {
+        background: var(--surface-alt);
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+
+    .task-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .task-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: var(--surface);
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        transition: all 0.2s ease;
+    }
+
+    .task-item:hover {
+        background: var(--surface-alt);
+        border-color: var(--primary);
+    }
+
+    .task-item.done {
+        opacity: 0.6;
+        background: rgba(0,0,0,0.02);
+    }
+
+    .task-checkbox {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        min-width: 24px;
+        flex-shrink: 0;
+    }
+
+    .task-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .task-title {
+        display: block;
+        font-weight: 600;
+        word-break: break-word;
+    }
+
+    .task-item.done .task-title {
+        text-decoration: line-through;
+    }
+
+    .task-meta {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+    }
+
+    .task-delete {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: 0.25rem 0.5rem;
+        flex-shrink: 0;
+        transition: color 0.2s ease;
+    }
+
+    .task-delete:hover {
+        color: var(--accent);
+    }
+
     .privacy-blur {
         filter: blur(5px);
         opacity: 0.7;
+        transition: filter 0.2s ease;
     }
+
     .privacy-blur:hover {
         filter: blur(0);
         opacity: 1;
     }
 
-    .task-section {
-        background: var(--surface-alt);
-        border-radius: var(--radius-md);
-        padding: 1.5rem;
-        border: 1px solid var(--border);
-    }
-
-    .todo-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.75rem;
-        padding: 0.75rem;
-        border-radius: var(--radius-sm);
-        transition: background-color 0.2s ease;
-        border-bottom: 1px solid rgba(0,0,0,0.1);
-    }
-
-    .todo-item:last-child {
-        border-bottom: none;
-    }
-
-    .todo-item:hover {
-        background: rgba(0, 0, 0, 0.05);
-    }
-
-    .todo-item.done {
-        opacity: 0.6;
-    }
-
-    .todo-item.done .title {
-        text-decoration: line-through;
-    }
-
-    .task-form-grid {
-        display: grid;
-        grid-template-columns: 1fr auto auto auto;
-        gap: 1rem;
-        align-items: end;
-    }
-
-    .field {
-        grid-column: span 1;
-    }
-
     @media (max-width: 768px) {
-        .task-form-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
+        .task-form-row {
+            flex-direction: column;
         }
 
-        .field:nth-child(1) {
-            grid-column: span 2;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .task-form-grid {
-            grid-template-columns: 1fr;
+        .task-controls {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
         }
 
-        .field:nth-child(1) {
-            grid-column: span 1;
+        .category-filters {
+            width: 100%;
         }
     }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Toggle task completion
-    document.querySelectorAll('.toggleBtn').forEach(btn => {
-        btn.addEventListener('click', async function() {
-            const taskId = this.closest('.todo-item').dataset.id;
-            const csrfToken = this.dataset.csrf;
+    // Category filter buttons
+    const filterBtns = document.querySelectorAll('.category-filter-btn');
+    const sections = document.querySelectorAll('.task-section');
+    let activeFilter = null;
+    let hideCompleted = false;
 
-            try {
-                const response = await fetch('?page=task_toggle', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: new URLSearchParams({
-                        'csrf': csrfToken,
-                        'id': taskId
-                    })
-                });
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const category = this.dataset.category;
 
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.status) {
-                        const item = this.closest('.todo-item');
-                        const title = item.querySelector('.title');
-
-                        if (data.status === 'done') {
-                            item.classList.add('done');
-                            this.textContent = '✅';
-                            if (title) {
-                                title.style.textDecoration = 'line-through';
-                            }
-                        } else {
-                            item.classList.remove('done');
-                            this.textContent = '⬜';
-                            if (title) {
-                                title.style.textDecoration = 'none';
-                            }
-                        }
-                    }
+            if (category === 'show-all') {
+                activeFilter = null;
+                hideCompleted = false;
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            } else if (category === 'hide-completed') {
+                hideCompleted = !hideCompleted;
+                this.classList.toggle('active');
+            } else {
+                if (activeFilter === category) {
+                    activeFilter = null;
+                    this.classList.remove('active');
+                } else {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    activeFilter = category;
+                    this.classList.add('active');
                 }
-            } catch (error) {
-                console.error('Error toggling task:', error);
             }
+            applyFilters();
         });
     });
+
+    function applyFilters() {
+        sections.forEach(section => {
+            let show = true;
+            const sectionCategory = section.dataset.category;
+
+            if (activeFilter && sectionCategory !== activeFilter) {
+                show = false;
+            }
+
+            section.style.display = show ? 'block' : 'none';
+
+            // Hide completed tasks if needed
+            if (show && hideCompleted) {
+                const items = section.querySelectorAll('.task-item');
+                items.forEach(item => {
+                    item.style.display = item.classList.contains('done') ? 'none' : 'flex';
+                });
+            } else if (show) {
+                const items = section.querySelectorAll('.task-item');
+                items.forEach(item => {
+                    item.style.display = 'flex';
+                });
+            }
+        });
+    }
 });
 </script>

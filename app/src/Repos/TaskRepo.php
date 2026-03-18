@@ -81,4 +81,10 @@ final class TaskRepo {
         // Return the new status so the frontend JS knows what to update the UI to
         return ['id' => $taskId, 'status' => $new];
     }
+
+    // Delete a task
+    public function delete(int $userId, int $taskId): bool {
+        $st = $this->pdo->prepare("DELETE FROM tasks WHERE id = ? AND user_id = ?");
+        return $st->execute([$taskId, $userId]);
+    }
 }

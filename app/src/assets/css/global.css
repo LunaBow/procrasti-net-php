@@ -512,3 +512,24 @@ button, .btn {
 input, select {
   font-family: inherit;
 }
+
+
+.task-form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.field {
+    flex: 1;
+    min-width: 0; /* Prevents overflow */
+    box-sizing: border-box;
+}
+
+.field input,
+.field select {
+    width: 100%;
+    box-sizing: border-box;
+}

@@ -79,4 +79,30 @@ final class TaskController {
         header('Location: ?page=tasks');
         exit;
     }
+
+    public function delete(): void {
+        Auth::requireLogin();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            Csrf::verify($_POST['csrf'] ?? null);
+
+            $taskId = (int)($_POST['id'] ?? 0);
+
+            if ($taskId > 0) {
+                // Delete the task
+                $st = $this->repo->delete(Auth::userId(), $taskId);
+
+                // If AJAX request, return JSON
+                if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => true]);
+                    exit;
+                }
+            }
+        }
+
+        // Redirect back to tasks
+        header('Location: ?page=tasks');
+        exit;
+    }
 }
