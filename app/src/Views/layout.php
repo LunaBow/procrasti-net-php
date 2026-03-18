@@ -14,8 +14,13 @@ $globalSettings = $globalSettings ?? [];
     <!-- Apply theme early to prevent flashbang -->
     <script>
         (function() {
-            if (localStorage.getItem('theme') === 'dark') {
-                document.documentElement.classList.add('pastel-mode');
+            var theme = localStorage.getItem('theme');
+            if (theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('pastel-mode');
+                } else if (theme !== 'light') {
+                    document.documentElement.classList.add(theme);
+                }
             }
         })();
     </script>
@@ -32,10 +37,15 @@ $globalSettings = $globalSettings ?? [];
             <h2 data-lang="header-subtitle">Fuck it, we ball.</h2>
             <div id="controls">
                 <div id="theme-switcher">
-                    <label class="switch" aria-label="Toggle theme">
-                        <input type="checkbox" id="theme-switcher-checkbox">
-                        <span class="slider round"></span>
-                    </label>
+                    <select id="theme-select" aria-label="Select theme" style="-webkit-appearance: none; -moz-appearance: none; appearance: none; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 0.5rem 1rem; font-weight: 600; color: var(--text); cursor: pointer; transition: all 0.2s ease;">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="blue-theme">Blue</option>
+                        <option value="green-theme">Green</option>
+                        <option value="purple-theme">Purple</option>
+                        <option value="pink-theme">Pink</option>
+                        <option value="orange-theme">Orange</option>
+                    </select>
                 </div>
                 <div id="language-switcher">
                     <select id="language-select">
@@ -55,7 +65,7 @@ $globalSettings = $globalSettings ?? [];
                 <div class="dropdown-wrapper"><a id="triggerSkills" href="?page=skills" data-lang="nav-skills">Skills</a></div>
                 <div class="dropdown-wrapper"><a id="triggerHabits" href="?page=habits" data-lang="nav-habits">Habits</a></div>
                 <div class="dropdown-wrapper"><a id="triggerPlanner" href="?page=planner" data-lang="nav-planner">Planner</a></div>
-                <div class="dropdown-wrapper"><a id="triggerCalendar" href="?page=calendar" data-lang="nav-calendar">Calendar</a></div>
+                <div class="dropdown-wrapper"><a id="triggerCalendar" href="?page=calendar" data-lang="nav-planner">Calendar</a></div>
                 <div class="dropdown-wrapper"><a id="triggerSettings" href="?page=settings" data-lang="nav-settings">Settings</a></div>
                 <?php if (Core\Auth::userId()): ?>
                     <div class="dropdown-wrapper"><a href="?page=logout" style="color: var(--accent);" data-lang="nav-logout">Logout</a></div>

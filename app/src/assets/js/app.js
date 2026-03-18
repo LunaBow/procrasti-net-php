@@ -1,7 +1,12 @@
 // Apply theme instantly
 (function() {
-    if (localStorage.getItem('theme') === 'dark') {
-        document.documentElement.classList.add('pastel-mode');
+    var theme = localStorage.getItem('theme');
+    if (theme) {
+        if (theme === 'dark') {
+            document.documentElement.classList.add('pastel-mode');
+        } else if (theme !== 'light') {
+            document.documentElement.classList.add(theme);
+        }
     }
 })();
 
@@ -191,20 +196,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- THEME SWITCHER ---
-    const themeSwitcher = document.getElementById('theme-switcher-checkbox');
+    const themeSwitcher = document.getElementById('theme-select');
     if (themeSwitcher) {
-        if (localStorage.getItem('theme') === 'dark') {
-            themeSwitcher.checked = true;
-        }
+        var theme = localStorage.getItem('theme') || 'light';
+        themeSwitcher.value = theme;
 
-        themeSwitcher.addEventListener('change', () => {
-            if (themeSwitcher.checked) {
+        themeSwitcher.addEventListener('change', (e) => {
+            document.documentElement.classList.remove('pastel-mode', 'blue-theme', 'green-theme', 'purple-theme', 'pink-theme', 'orange-theme');
+            const selectedTheme = e.target.value;
+            if (selectedTheme === 'dark') {
                 document.documentElement.classList.add('pastel-mode');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.classList.remove('pastel-mode');
-                localStorage.setItem('theme', 'light');
+            } else if (selectedTheme !== 'light') {
+                document.documentElement.classList.add(selectedTheme);
             }
+            localStorage.setItem('theme', selectedTheme);
         });
     }
 

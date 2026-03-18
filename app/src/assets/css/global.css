@@ -100,6 +100,38 @@ html.purple-theme {
   --shadow-lg: 0 12px 32px rgba(123,31,162,0.2);
 }
 
+html.pink-theme {
+  --bg: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+  --surface: #ffffff;
+  --surface-alt: #fff0f5;
+  --primary: #c2185b;
+  --primary-hover: #ad1457;
+  --accent: #ffb300;
+  --accent-hover: #ffa000;
+  --text: #880e4f;
+  --text-muted: #ad1457;
+  --border: #f8bbd0;
+  --shadow-sm: 0 2px 4px rgba(194,24,91,0.1);
+  --shadow-md: 0 4px 12px rgba(194,24,91,0.15);
+  --shadow-lg: 0 12px 32px rgba(194,24,91,0.2);
+}
+
+html.orange-theme {
+  --bg: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  --surface: #ffffff;
+  --surface-alt: #fff8e1;
+  --primary: #f57c00;
+  --primary-hover: #ef6c00;
+  --accent: #00acc1;
+  --accent-hover: #0097a7;
+  --text: #e65100;
+  --text-muted: #f57c00;
+  --border: #ffe0b2;
+  --shadow-sm: 0 2px 4px rgba(245,124,0,0.1);
+  --shadow-md: 0 4px 12px rgba(245,124,0,0.15);
+  --shadow-lg: 0 12px 32px rgba(245,124,0,0.2);
+}
+
 /* Hand-Drawn Mode Variables */
 html.hand-drawn-mode {
     --font-ui: 'Architects Daughter', cursive;
@@ -398,7 +430,7 @@ header h2 {
     margin-top: 1rem;
 }
 
-#language-switcher select {
+#language-switcher select, #theme-switcher select {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -412,7 +444,7 @@ header h2 {
     transition: all 0.2s ease;
 }
 
-#language-switcher select:hover {
+#language-switcher select:hover, #theme-switcher select:hover {
     background: var(--surface-alt);
     border-color: var(--primary);
 }
