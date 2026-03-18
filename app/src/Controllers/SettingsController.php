@@ -49,9 +49,17 @@ final class SettingsController {
             $this->repo->updateSettings($userId, $gamification, $privacy, $sarcasm, $handDrawn, $leet);
             
             flash('success', 'Task failed successfully. Nah, jk, i saved it lol. We ball.');
+
+            // Clear output buffer and redirect
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
+            header('Location: ?page=settings');
+            exit();
         }
-        
+
+        // If not POST, just redirect to settings
         header('Location: ?page=settings');
-        exit;
+        exit();
     }
 }

@@ -42,8 +42,15 @@ if (!file_exists($envFile)) {
     $config = require $envFile;
 }
 
-$db = new Database($config['db']);
-$pdo = $db->pdo();
+try {
+    $db = new Database($config['db']);
+    $pdo = $db->pdo();
+} catch (\PDOException $e) {
+    error_log('Database Connection Error: ' . $e->getMessage());
+    http_response_code(500);
+    echo 'Database connection failed. Please check your configuration. Error: ' . htmlspecialchars($e->getMessage());
+    exit;
+}
 
 // Just making sure the habit tables exist if they don't already. 
 try {
@@ -65,6 +72,44 @@ try {
         $pdo->exec($settingsSql);
     }
     
+    // Check if user_settings table has the correct PRIMARY KEY
+    try {
+        $constraints = $pdo->query("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_NAME='user_settings' AND CONSTRAINT_NAME='PRIMARY' AND COLUMN_NAME='user_id'");
+        $hasPrimaryKey = $constraints->rowCount() > 0;
+
+        // If no primary key and there are duplicate user_ids, fix it
+        if (!$hasPrimaryKey) {
+            // Check for duplicates
+            $dupeCheck = $pdo->query("SELECT user_id, COUNT(*) as cnt FROM user_settings GROUP BY user_id HAVING cnt > 1");
+            if ($dupeCheck->rowCount() > 0) {
+                // We have duplicates and no primary key - need to clean this up
+                // Create backup, keep only latest per user
+                $pdo->exec("
+                    DROP TABLE IF EXISTS user_settings_backup;
+                    CREATE TABLE user_settings_backup LIKE user_settings;
+                    INSERT INTO user_settings_backup SELECT * FROM user_settings;
+                ");
+
+                // Clear and rebuild with only latest entries
+                $pdo->exec("
+                    DELETE FROM user_settings;
+                ");
+
+                $pdo->exec("
+                    INSERT INTO user_settings (user_id, allow_gamification, privacy_mode, sarcastic_comments, hand_drawn_mode, leet_speak, updated_at)
+                    SELECT user_id, allow_gamification, privacy_mode, sarcastic_comments, hand_drawn_mode, leet_speak, MAX(updated_at) as updated_at
+                    FROM user_settings_backup
+                    GROUP BY user_id;
+                ");
+
+                // Add primary key constraint
+                $pdo->exec("ALTER TABLE user_settings ADD PRIMARY KEY (user_id)");
+            }
+        }
+    } catch (\Throwable $e) {
+        error_log('Settings table constraint check failed: ' . $e->getMessage());
+    }
+
     // Run the migration for new columns separately so it doesn't break the initial setup
     $migrationSql = file_get_contents(__DIR__ . '/../src/db/settings_migration.sql');
     if ($migrationSql) {
@@ -144,6 +189,7 @@ switch ($page) {
     case 'tasks': $tasks->index(); break;
     case 'task_create': $tasks->create(); break;
     case 'task_toggle': $tasks->toggle(); break;
+    case 'task_delete': $tasks->delete(); break;
 
     case 'categories': $categories->index(); break;
     case 'skills': $skills->index(); break;

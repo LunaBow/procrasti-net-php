@@ -19,10 +19,11 @@ final class SkillRepo {
 
     public function byCategory(int $categoryId): array {
         $st = $this->pdo->prepare("
-            SELECT id, name, description, difficulty_level, energy_required
-            FROM skills
-            WHERE category_id = ?
-            ORDER BY name ASC
+            SELECT s.id, s.name, s.description, s.difficulty_level, s.energy_required, c.name as category_name
+            FROM skills s
+            JOIN categories c ON s.category_id = c.id
+            WHERE s.category_id = ?
+            ORDER BY s.name ASC
         ");
         $st->execute([$categoryId]);
         return $st->fetchAll();

@@ -9,10 +9,12 @@ final class TaskRepo {
     // Grab all tasks for a specific user, ordered newest first
     public function allByUser(int $userId): array {
         $st = $this->pdo->prepare("
-            SELECT id, title, status, energy_required, due_at, created_at
-            FROM tasks
-            WHERE user_id = ?
-            ORDER BY id DESC
+            SELECT t.id, t.title, t.status, t.energy_required, t.due_at, t.created_at, t.category_id,
+                   c.name as category_name, c.color_code
+            FROM tasks t
+            LEFT JOIN categories c ON t.category_id = c.id
+            WHERE t.user_id = ?
+            ORDER BY t.id DESC
         ");
         $st->execute([$userId]);
         return $st->fetchAll();
@@ -45,10 +47,17 @@ final class TaskRepo {
     }
 
     // Toss a new task into the pile
-    public function create(int $userId, string $title): int {
-        $st = $this->pdo->prepare("INSERT INTO tasks (user_id, title, status) VALUES (?, ?, 'todo')");
-        $st->execute([$userId, $title]);
+    public function create(int $userId, string $title, ?int $categoryId = null): int {
+        $st = $this->pdo->prepare("INSERT INTO tasks (user_id, title, status, category_id) VALUES (?, ?, 'todo', ?)");
+        $st->execute([$userId, $title, $categoryId]);
         return (int)$this->pdo->lastInsertId();
+    }
+
+    // Delete a task
+    public function delete(int $userId, int $taskId): bool {
+        $st = $this->pdo->prepare("DELETE FROM tasks WHERE id = ? AND user_id = ?");
+        $st->execute([$taskId, $userId]);
+        return $st->rowCount() > 0;
     }
 
     // Switch a task between 'done' and 'todo'
