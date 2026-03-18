@@ -32,6 +32,14 @@ const languages = {
         'nav-youtube-videos': 'YouTube Videos',
         'nav-gutenberg-books': 'Project Gutenberg Books',
         'nav-reddit-community': 'Reddit Community',
+        'nav-my-connections': 'My Connections',
+        'nav-distractions': 'Distractions',
+        'nav-resources': 'Resources',
+        'nav-youtube-lunarbower': 'YouTube @LunarBower',
+        'nav-threads-lunartic': 'Threads @luna_tic_tic_boom',
+        'nav-instagram-lunartic': 'Instagram @luna_tic_tic_boom',
+        'nav-github-lunabow': 'GitHub LunaBow',
+        'nav-spotify-lunarbower': 'Spotify Lunar Bower',
 
         // Footer
         'footer-about-title': 'Procrasti-net',
@@ -156,6 +164,14 @@ const languages = {
         'nav-youtube-videos': 'YouTube Videos',
         'nav-gutenberg-books': 'Project Gutenberg Bücher',
         'nav-reddit-community': 'Reddit Community',
+        'nav-my-connections': 'Meine Verbindungen',
+        'nav-distractions': 'Ablenkungen',
+        'nav-resources': 'Ressourcen',
+        'nav-youtube-lunarbower': 'YouTube @LunarBower',
+        'nav-threads-lunartic': 'Threads @luna_tic_tic_boom',
+        'nav-instagram-lunartic': 'Instagram @luna_tic_tic_boom',
+        'nav-github-lunabow': 'GitHub LunaBow',
+        'nav-spotify-lunarbower': 'Spotify Luna Bow',
 
         // Footer
         'footer-about-title': 'Procrasti-net',

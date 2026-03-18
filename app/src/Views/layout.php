@@ -68,22 +68,32 @@ $globalSettings = $globalSettings ?? [];
         <!-- Extra Navigation Slide-out Menu -->
         <nav class="nav-extra-menu" aria-label="Extra navigation">
             <div class="dropdown-wrapper">
-                <a id="triggerEvaluation" class="dropbtn" href="https://www.mindtools.com/pages/main/newMN_80.htm" data-lang="nav-mindtools-reality-check">MindTools Reality Check</a>
+                <a id="triggerConnections" class="dropbtn" href="#" data-lang="nav-my-connections">My Connections</a>
                 <div class="dropdown-content">
-                    <a id="triggerRequired" href="https://www.productivityist.com/bare-minimum-tasks/" data-lang="nav-productivityist-bare-minimum">Productivityist Bare Minimum</a>
-                    <a id="triggerBoot" href="https://www.headspace.com/" data-lang="nav-headspace-mindfulness">Headspace Mindfulness</a>
+                    <a href="https://www.youtube.com/@LunarBower" data-lang="nav-youtube-lunarbower">YouTube @LunarBower</a>
+                    <a href="https://www.threads.com/@luna_tic_tic_boom" data-lang="nav-threads-lunartic">Threads @luna_tic_tic_boom</a>
+                    <a href="https://www.instagram.com/luna_tic_tic_boom/" data-lang="nav-instagram-lunartic">Instagram @luna_tic_tic_boom</a>
+                    <a href="https://github.com/LunaBow" data-lang="nav-github-lunabow">GitHub LunaBow</a>
+                    <a href="https://open.spotify.com/artist/2rWHud9CFPTzoDgCKh0t4S" data-lang="nav-spotify-lunarbower">Spotify Lunar Bower</a>
                 </div>
             </div>
             <div class="dropdown-wrapper">
-                <a id="triggerArt" class="dropbtn" href="https://www.newgrounds.com/" data-lang="nav-newgrounds-games">Newgrounds Games</a>
+                <a id="triggerDistractions" class="dropbtn" href="#" data-lang="nav-distractions">Distractions</a>
                 <div class="dropdown-content">
-                    <a id="showDrawingsOnly" href="https://www.deviantart.com/" data-lang="nav-deviantart-gallery">DeviantArt Gallery</a>
-                    <a id="showAVOnly" href="https://www.youtube.com/" data-lang="nav-youtube-videos">YouTube Videos</a>
-                    <a id="showBooksOnly" href="https://www.gutenberg.org/" data-lang="nav-gutenberg-books">Project Gutenberg Books</a>
+                    <a href="https://www.newgrounds.com/" data-lang="nav-newgrounds-games">Newgrounds Games</a>
+                    <a href="https://www.deviantart.com/" data-lang="nav-deviantart-gallery">DeviantArt Gallery</a>
+                    <a href="https://www.youtube.com/" data-lang="nav-youtube-videos">YouTube Videos</a>
+                    <a href="https://www.reddit.com/" data-lang="nav-reddit-community">Reddit Community</a>
                 </div>
             </div>
             <div class="dropdown-wrapper">
-                <a id="TriggerMember" class="dropbtn" href="https://www.reddit.com/" data-lang="nav-reddit-community">Reddit Community</a>
+                <a id="triggerResources" class="dropbtn" href="#" data-lang="nav-resources">Resources</a>
+                <div class="dropdown-content">
+                    <a href="https://www.mindtools.com/pages/main/newMN_80.htm" data-lang="nav-mindtools-reality-check">MindTools Reality Check</a>
+                    <a href="https://www.productivityist.com/bare-minimum-tasks/" data-lang="nav-productivityist-bare-minimum">Productivityist Bare Minimum</a>
+                    <a href="https://www.headspace.com/" data-lang="nav-headspace-mindfulness">Headspace Mindfulness</a>
+                    <a href="https://www.gutenberg.org/" data-lang="nav-gutenberg-books">Project Gutenberg Books</a>
+                </div>
             </div>
         </nav>
     </section>
