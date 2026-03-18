@@ -27,7 +27,20 @@ use Repos\HabitRepo;
 use Repos\SettingsRepo;
 
 // Pulling in my DB secrets from outside the public folder (security first!)
-$config = require __DIR__ . '/../../.env.php';
+$envFile = __DIR__ . '/../../.env.php';
+if (!file_exists($envFile)) {
+    // Fallback to default config if .env.php doesn't exist
+    $config = [
+        'db' => [
+            'host' => $_ENV['DB_HOST'] ?? 'localhost',
+            'name' => $_ENV['DB_NAME'] ?? 'procrasti_net',
+            'user' => $_ENV['DB_USER'] ?? 'root',
+            'pass' => $_ENV['DB_PASS'] ?? '',
+        ]
+    ];
+} else {
+    $config = require $envFile;
+}
 
 $db = new Database($config['db']);
 $pdo = $db->pdo();
@@ -78,7 +91,7 @@ function e(string $s): string {
     return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); 
 }
 
-// Flash messages for little "hey you fucked up your password" popups.
+// Flash messages for little "wrong password" popups.
 function flash(string $key, ?string $set = null): ?string {
     Auth::start();
     if ($set !== null) { 
@@ -103,7 +116,7 @@ $planner = new PlannerController($taskRepo);
 $calendar = new CalendarController($taskRepo);
 $settings = new SettingsController($settingsRepo);
 
-// Simple layout renderer.
+//  layout renderer.
 function render(string $view, array $data = []): void {
     global $settingsRepo;
     
