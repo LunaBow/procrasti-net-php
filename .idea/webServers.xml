@@ -9,6 +9,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="cb201fae-087e-46a0-8114-586e5a786c75" name="procrastinet">
+        <fileTransfer accessType="SFTP" host="php.ustp.cloud" port="22" sshConfigId="572deccf-a940-437f-8ab2-5474717ca202" sshConfig="php-mt231043-22290@php.ustp.cloud:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

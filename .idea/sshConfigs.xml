@@ -3,6 +3,7 @@
   <component name="SshConfigs">
     <configs>
       <sshConfig authType="PASSWORD" host="php.ustp.cloud" id="411bb62b-e7f7-4a3b-8e6a-a1a4c937e6bb" port="22" nameFormat="DESCRIPTIVE" username="php-mt231043-22290" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="php.ustp.cloud" id="572deccf-a940-437f-8ab2-5474717ca202" port="22" nameFormat="DESCRIPTIVE" username="php-mt231043-22290" useOpenSSHConfig="true" />
     </configs>
   </component>
 </project>

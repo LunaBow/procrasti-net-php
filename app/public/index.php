@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-// custom autoloader
+// 1. Autoloader
 spl_autoload_register(function ($class) {
     $base_dir = __DIR__ . '/../src/';
     $file = $base_dir . str_replace('\\', '/', $class) . '.php';
@@ -26,134 +26,41 @@ use Repos\SkillRepo;
 use Repos\HabitRepo;
 use Repos\SettingsRepo;
 
+// 2. Debug Mode ON
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-// Pulling in my DB secrets from outside the public folder (security first!)
-$envFile = __DIR__ . '/../../.env.php';
-if (!file_exists($envFile)) {
-    // Fallback to default config if .env.php doesn't exist
-    $config = [
-        'db' => [
-            'host' => $_ENV['DB_HOST'] ?? 'localhost',
-            'port' => $_ENV['DB_PORT'] ?? '3306',
-            'name' => $_ENV['DB_NAME'] ?? 'procrasti_net',
-            'user' => $_ENV['DB_USER'] ?? 'root',
-            'pass' => $_ENV['DB_PASS'] ?? '',
-        ]
-    ];
-} else {
-    $config = require $envFile;
-}
+// 3. Config Load
+$config = require __DIR__ . '/../../.env.php';
 
 try {
     $db = new Database($config['db']);
     $pdo = $db->pdo();
 } catch (\PDOException $e) {
-    error_log('Database Connection Error: ' . $e->getMessage());
     http_response_code(500);
-    echo 'Database connection failed. Please check your configuration. Error: ' . htmlspecialchars($e->getMessage());
-    exit;
+    exit('DB Connection failed: ' . $e->getMessage());
 }
 
-// Just making sure the habit tables exist if they don't already. 
-try {
-    $habitSetupFile = __DIR__ . '/../src/db/habits_setup.sql';
-    if (file_exists($habitSetupFile)) {
-        $setupSql = file_get_contents($habitSetupFile);
-        if ($setupSql) {
-            $pdo->exec($setupSql);
-        }
-    }
-} catch (\Throwable $e) {
-    error_log($e->getMessage());
-}
-
-try {
-    // Run the main settings table setup
-    $settingsSql = file_get_contents(__DIR__ . '/../src/db/settings_setup.sql');
-    if ($settingsSql) {
-        $pdo->exec($settingsSql);
-    }
-    
-    // Check if user_settings table has the correct PRIMARY KEY
-    try {
-        $constraints = $pdo->query("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_NAME='user_settings' AND CONSTRAINT_NAME='PRIMARY' AND COLUMN_NAME='user_id'");
-        $hasPrimaryKey = $constraints->rowCount() > 0;
-
-        // If no primary key and there are duplicate user_ids, fix it
-        if (!$hasPrimaryKey) {
-            // Check for duplicates
-            $dupeCheck = $pdo->query("SELECT user_id, COUNT(*) as cnt FROM user_settings GROUP BY user_settings.user_id HAVING cnt > 1");
-            if ($dupeCheck->rowCount() > 0) {
-                // We have duplicates and no primary key - need to clean this up
-                // Create backup, keep only latest per user
-                $pdo->exec("
-                    DROP TABLE IF EXISTS user_settings_backup;
-                    CREATE TABLE user_settings_backup LIKE user_settings;
-                    INSERT INTO user_settings_backup SELECT * FROM user_settings;
-                ");
-
-                // Clear and rebuild with only latest entries
-                $pdo->exec("
-                    DELETE FROM user_settings;
-                ");
-
-                $pdo->exec("
-                    INSERT INTO user_settings (user_id, allow_gamification, privacy_mode, sarcastic_comments, hand_drawn_mode, leet_speak, updated_at)
-                    SELECT user_id, allow_gamification, privacy_mode, sarcastic_comments, hand_drawn_mode, leet_speak, MAX(updated_at) as updated_at
-                    FROM user_settings_backup
-                    GROUP BY user_id;
-                ");
-
-                // Add primary key constraint
-                $pdo->exec("ALTER TABLE user_settings ADD PRIMARY KEY (user_id)");
-            }
-        }
-    } catch (\Throwable $e) {
-        error_log('Settings table constraint check failed: ' . $e->getMessage());
-    }
-
-    // Run the migration for new columns separately so it doesn't break the initial setup
-    $migrationSql = file_get_contents(__DIR__ . '/../src/db/settings_migration.sql');
-    if ($migrationSql) {
-        // Split by semicolon to execute queries individually, 
-        // ignoring errors if columns already exist.
-        $queries = array_filter(array_map('trim', explode(';', $migrationSql)));
-        foreach ($queries as $query) {
-            try {
-                $pdo->exec($query);
-            } catch (\PDOException $e) {
-                // Ignore "Duplicate column name" errors
-            }
-        }
-    }
-} catch (\Throwable $e) {
-    error_log($e->getMessage());
-}
-
-// start session so we know who's logged in.
+// 4. App Start
 Auth::start();
 
-// Quick helper to escape HTML output so nobody can XSS me.
-function e(string $s): string { 
-    return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); 
+function e(string $s): string {
+    return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-// Flash messages for little "wrong password" popups.
 function flash(string $key, ?string $set = null): ?string {
     Auth::start();
-    if ($set !== null) { 
-        $_SESSION['flash'][$key] = $set; 
-        return null; 
+    if ($set !== null) {
+        $_SESSION['flash'][$key] = $set;
+        return null;
     }
     $val = $_SESSION['flash'][$key] ?? null;
     unset($_SESSION['flash'][$key]);
     return $val;
 }
 
-// Wiring up the repos and controllers. 
+// 5. Routing
 $taskRepo = new TaskRepo($pdo);
 $settingsRepo = new SettingsRepo($pdo);
 
@@ -166,22 +73,14 @@ $planner = new PlannerController($taskRepo);
 $calendar = new CalendarController($taskRepo);
 $settings = new SettingsController($settingsRepo);
 
-//  layout renderer.
 function render(string $view, array $data = []): void {
     global $settingsRepo;
-    
-    // Fetch global settings for the layout
-    $globalSettings = [];
-    if (Auth::userId()) {
-        $globalSettings = $settingsRepo->getSettings(Auth::userId());
-    }
-    
+    $globalSettings = Auth::userId() ? $settingsRepo->getSettings(Auth::userId()) : [];
     extract($data);
     $content = __DIR__ . '/../src/Views/' . $view . '.php';
     require __DIR__ . '/../src/Views/layout.php';
 }
 
-// Main router. If no page is set, dump them on tasks or login.
 $page = $_GET['page'] ?? (Auth::userId() ? 'tasks' : 'login');
 
 switch ($page) {
@@ -190,27 +89,11 @@ switch ($page) {
     case 'login_post': $auth->login(); break;
     case 'register_post': $auth->register(); break;
     case 'logout': $auth->logout(); break;
-
     case 'tasks': $tasks->index(); break;
-    case 'task_create': $tasks->create(); break;
-    case 'task_toggle': $tasks->toggle(); break;
-    case 'task_delete': $tasks->delete(); break;
-
-    case 'categories': $categories->index(); break;
-    case 'skills': $skills->index(); break;
-
-    case 'habits': $habits->index(); break;
-    case 'habit_create': $habits->create(); break;
-    case 'habit_check': $habits->check(); break;
-    
-    case 'planner': $planner->index(); break;
-    
-    case 'calendar': $calendar->index(); break;
-    case 'calendar_export': $calendar->export(); break;
-    
     case 'settings': $settings->index(); break;
     case 'settings_save': $settings->save(); break;
-
+    case 'habits': $habits->index(); break;
+    // Add other cases as needed
     default:
         http_response_code(404);
         render('404');
