@@ -1,4 +1,5 @@
 <?php
+// app/src/Views/layout.php - The main wrapper for all pages
 $title = $title ?? 'Procrastinate-php';
 $globalSettings = $globalSettings ?? [];
 ?>
@@ -8,10 +9,11 @@ $globalSettings = $globalSettings ?? [];
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= htmlspecialchars($title) ?></title>
-    <!-- Use relative paths or dynamically echo the correct base path -->
+    
+    <!-- Link to our global CSS styles -->
     <link rel="stylesheet" href="../src/assets/css/global.css">
     
-    <!-- Apply theme early to prevent flash of unstyled content -->
+    <!-- AI Help: This small script runs before the page loads to prevent a "flash" of white if dark mode is on. -->
     <script>
         (function() {
             const theme = localStorage.getItem('theme');
@@ -30,12 +32,15 @@ $globalSettings = $globalSettings ?? [];
     data-leet-speak="<?= !empty($globalSettings['leet_speak']) ? 'true' : 'false' ?>"
     data-sarcastic-comments="<?= !empty($globalSettings['sarcastic_comments']) ? 'true' : 'false' ?>"
 >
+
 <div id="entireContentWrapper">
+    <!-- Header with Title and Theme/Language Switchers -->
     <header id="headerHeading">
         <div class="container">
             <h1><a href="?page=tasks" data-lang="header-title">procrastinate-net</a></h1>
             <h2 data-lang="header-subtitle">Fuck it, we ball.</h2>
             <div id="controls">
+                <!-- Theme Selection -->
                 <div id="theme-switcher">
                     <select id="theme-select" aria-label="Select theme" style="-webkit-appearance: none; -moz-appearance: none; appearance: none; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 0.5rem 1rem; font-weight: 600; color: var(--text); cursor: pointer; transition: all 0.2s ease;">
                         <option value="light">Light</option>
@@ -47,6 +52,7 @@ $globalSettings = $globalSettings ?? [];
                         <option value="orange-theme">Orange</option>
                     </select>
                 </div>
+                <!-- Language Selection -->
                 <div id="language-switcher">
                     <select id="language-select">
                         <option value="en">EN</option>
@@ -57,9 +63,9 @@ $globalSettings = $globalSettings ?? [];
         </div>
     </header>
 
+    <!-- Main Navigation Bar -->
     <section id="nav_ul">
         <div id="navWrapper" class="nav-stack">
-            <!-- Row 1: core app navigation -->
             <nav class="nav-core" aria-label="Primary navigation">
                 <div class="dropdown-wrapper"><a id="triggerTodos" href="?page=tasks" data-lang="nav-todos">To-dos</a></div>
                 <div class="dropdown-wrapper"><a id="triggerSkills" href="?page=skills" data-lang="nav-skills">Skills</a></div>
@@ -67,7 +73,8 @@ $globalSettings = $globalSettings ?? [];
                 <div class="dropdown-wrapper"><a id="triggerPlanner" href="?page=planner" data-lang="nav-planner">Planner</a></div>
                 <div class="dropdown-wrapper"><a id="triggerCalendar" href="?page=calendar" data-lang="nav-calendar">Calendar</a></div>
                 <div class="dropdown-wrapper"><a id="triggerSettings" href="?page=settings" data-lang="nav-settings">Settings</a></div>
-                <?php if (Core\Auth::userId()): ?>
+                
+                <?php if (auth_user_id()): ?>
                     <div class="dropdown-wrapper"><a href="?page=logout" style="color: var(--accent);" data-lang="nav-logout">Logout</a></div>
                 <?php else: ?>
                     <div class="dropdown-wrapper"><a href="?page=login" style="color: var(--primary);" data-lang="nav-login">Login</a></div>
@@ -75,14 +82,12 @@ $globalSettings = $globalSettings ?? [];
             </nav>
         </div>
 
-        <!-- Extra Navigation Slide-out Menu -->
+        <!-- Extra Links (Connections, Distractions, Resources) -->
         <nav class="nav-extra-menu" aria-label="Extra navigation">
             <div class="dropdown-wrapper">
                 <a id="triggerConnections" class="dropbtn" href="#" data-lang="nav-my-connections">My Connections</a>
                 <div class="dropdown-content">
                     <a href="https://www.youtube.com/@LunarBower" data-lang="nav-youtube-lunarbower">YouTube @LunarBower</a>
-                    <a href="https://www.threads.com/@luna_tic_tic_boom" data-lang="nav-threads-lunartic">Threads @luna_tic_tic_boom</a>
-                    <a href="https://www.instagram.com/luna_tic_tic_boom/" data-lang="nav-instagram-lunartic">Instagram @luna_tic_tic_boom</a>
                     <a href="https://github.com/LunaBow" data-lang="nav-github-lunabow">GitHub LunaBow</a>
                     <a href="https://open.spotify.com/artist/2rWHud9CFPTzoDgCKh0t4S" data-lang="nav-spotify-lunarbower">Spotify Lunar Bower</a>
                 </div>
@@ -91,8 +96,6 @@ $globalSettings = $globalSettings ?? [];
                 <a id="triggerDistractions" class="dropbtn" href="#" data-lang="nav-distractions">Distractions</a>
                 <div class="dropdown-content">
                     <a href="https://www.newgrounds.com/" data-lang="nav-newgrounds-games">Newgrounds Games</a>
-                    <a href="https://www.deviantart.com/" data-lang="nav-deviantart-gallery">DeviantArt Gallery</a>
-                    <a href="https://www.youtube.com/" data-lang="nav-youtube-videos">YouTube Videos</a>
                     <a href="https://www.reddit.com/" data-lang="nav-reddit-community">Reddit Community</a>
                 </div>
             </div>
@@ -100,22 +103,23 @@ $globalSettings = $globalSettings ?? [];
                 <a id="triggerResources" class="dropbtn" href="#" data-lang="nav-resources">Resources</a>
                 <div class="dropdown-content">
                     <a href="https://www.mindtools.com/pages/main/newMN_80.htm" data-lang="nav-mindtools-reality-check">MindTools Reality Check</a>
-                    <a href="https://www.productivityist.com/bare-minimum-tasks/" data-lang="nav-productivityist-bare-minimum">Productivityist Bare Minimum</a>
                     <a href="https://www.headspace.com/" data-lang="nav-headspace-mindfulness">Headspace Mindfulness</a>
-                    <a href="https://www.gutenberg.org/" data-lang="nav-gutenberg-books">Project Gutenberg Books</a>
                 </div>
             </div>
         </nav>
     </section>
 
+    <!-- Main Content Area -->
     <div id="JoinContent" style="display: block;">
         <main>
+            <!-- Show error messages if they exist in the flash session -->
             <?php if ($msg = flash('error')): ?>
                 <div class="container" style="text-align: center; margin-bottom: 1rem;">
                     <p class="error" style="color: var(--accent); font-weight: bold;"><?= htmlspecialchars($msg) ?></p>
                 </div>
             <?php endif; ?>
             
+            <!-- AI Help: include $content actually puts the code from the view file here. -->
             <?php if (isset($content) && file_exists($content)): ?>
                 <?php include $content; ?>
             <?php else: ?>
@@ -124,21 +128,17 @@ $globalSettings = $globalSettings ?? [];
         </main>
     </div>
 
+    <!-- Footer Area -->
     <section id="footer">
         <footer>
             <div class="footer-site-footercontainer">
                 <div class="footer-about">
                     <p><strong data-lang="footer-about-title">Procrastinate-net</strong></p>
                     <p data-lang="footer-about-p1">We're here to do tasks and chew bubblegum. And we have a lot of bubble gum.</p>
-                    <p data-lang="footer-about-p2">Build for Luna and Verena, may they stop procrastinating and start working on shit.</p>
                 </div>
                 <div class="footer-contact">
                     <p><strong data-lang="footer-contact-title">Contact</strong></p>
-                    <p data-lang="footer-contact-p1">Email:</p>
-                    <p data-lang="footer-contact-p2">mt231043@ustp-students.at,</p>
-                    <p data-lang="footer-contact-p3">mt241068@ustp-students.at,</p>
-                    <p data-lang="footer-contact-p4">asteudres@ustp.at</p>
-                    <p data-lang="footer-contact-p5">Phone: +43676/7875431</p>
+                    <p data-lang="footer-contact-p2">mt231043@ustp-students.at</p>
                     <p data-lang="footer-contact-p6">We'll reply eventually. It's on the todo list. Maybe Tomorrow.</p>
                 </div>
             </div>
@@ -146,6 +146,7 @@ $globalSettings = $globalSettings ?? [];
     </section>
 </div>
 
+<!-- Load JavaScript at the end for better performance -->
 <script src="../src/assets/js/languages.js"></script>
 <script src="../src/assets/js/app.js" defer></script>
 </body>

@@ -1,19 +1,23 @@
-<?php $title = 'Login - Procrasti-php'; ?>
+<?php 
+// app/src/Views/login.php - User login page
+$title = 'Login'; 
+?>
 
 <div class="content" style="max-width: 400px; margin: 4rem auto; text-align: center;">
     <h1 style="margin-bottom: 2rem;">Welcome Back</h1>
 
     <form method="post" action="?page=login_post" class="stack">
-        <input type="hidden" name="csrf" value="<?= e(Core\Csrf::token()) ?>">
+        <!-- CSRF Token for security (AI HELP) -->
+        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
         
         <div class="field" style="text-align: left;">
             <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Email</label>
-            <input name="email" type="email" class="item" style="width: 100%; box-sizing: border-box;" required>
+            <input name="email" type="email" class="item" style="width: 100%; box-sizing: border-box;" required placeholder="Enter your email">
         </div>
         
         <div class="field" style="text-align: left; margin-bottom: 1.5rem;">
             <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Password</label>
-            <input name="password" type="password" class="item" style="width: 100%; box-sizing: border-box;" required>
+            <input name="password" type="password" class="item" style="width: 100%; box-sizing: border-box;" required placeholder="Enter your password">
         </div>
         
         <button type="submit" class="pill" style="width: 100%;">Login</button>

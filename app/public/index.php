@@ -1,99 +1,150 @@
 <?php
-declare(strict_types=1);
+// app/public/index.php - The Front Controller and Router
 
-// 1. Autoloader
-spl_autoload_register(function ($class) {
-    $base_dir = __DIR__ . '/../src/';
-    $file = $base_dir . str_replace('\\', '/', $class) . '.php';
-    if (file_exists($file)) {
-        require $file;
-    }
-});
+// Include our core functions and action logic
+require_once __DIR__ . '/../src/core.php';
+require_once __DIR__ . '/../src/actions.php';
 
-use Core\Database;
-use Core\Auth;
-use Controllers\AuthController;
-use Controllers\TaskController;
-use Controllers\CategoryController;
-use Controllers\SkillController;
-use Controllers\HabitController;
-use Controllers\PlannerController;
-use Controllers\CalendarController;
-use Controllers\SettingsController;
-use Repos\TaskRepo;
-use Repos\CategoryRepo;
-use Repos\SkillRepo;
-use Repos\HabitRepo;
-use Repos\SettingsRepo;
-
-// 2. Debug Mode ON
+// --- DEBUGGING ---
+// show errors on the screen
+// In a real production app, you would turn these off for security.
 ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-// 3. Config Load
+// --- SETUP ---
+// Load database configuration from the .env.php file in the root
 $config = require __DIR__ . '/../../.env.php';
 
-try {
-    $db = new Database($config['db']);
-    $pdo = $db->pdo();
-} catch (\PDOException $e) {
-    http_response_code(500);
-    exit('DB Connection failed: ' . $e->getMessage());
-}
+// Connect to the database using our helper function in core.php
+$pdo = db_connect($config['db']);
 
-// 4. App Start
-Auth::start();
+// Start the session (to keep track of logged-in users)
+auth_start();
 
-function e(string $s): string {
-    return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-}
+// --- ROUTING ---
+// Get the page name from the URL
+// If no page is specified, go to 'tasks' if logged in, otherwise 'login'.
+$page = $_GET['page'] ?? (auth_user_id() ? 'tasks' : 'login');
 
-function flash(string $key, ?string $set = null): ?string {
-    Auth::start();
-    if ($set !== null) {
-        $_SESSION['flash'][$key] = $set;
-        return null;
-    }
-    $val = $_SESSION['flash'][$key] ?? null;
-    unset($_SESSION['flash'][$key]);
-    return $val;
-}
-
-// 5. Routing
-$taskRepo = new TaskRepo($pdo);
-$settingsRepo = new SettingsRepo($pdo);
-
-$auth = new AuthController($pdo);
-$tasks = new TaskController($taskRepo, $settingsRepo);
-$categories = new CategoryController(new CategoryRepo($pdo));
-$skills = new SkillController(new SkillRepo($pdo));
-$habits = new HabitController(new HabitRepo($pdo));
-$planner = new PlannerController($taskRepo);
-$calendar = new CalendarController($taskRepo);
-$settings = new SettingsController($settingsRepo);
-
-function render(string $view, array $data = []): void {
-    global $settingsRepo;
-    $globalSettings = Auth::userId() ? $settingsRepo->getSettings(Auth::userId()) : [];
-    extract($data);
-    $content = __DIR__ . '/../src/Views/' . $view . '.php';
-    require __DIR__ . '/../src/Views/layout.php';
-}
-
-$page = $_GET['page'] ?? (Auth::userId() ? 'tasks' : 'login');
-
+// The switch statement decides which view to run based on the page name.
 switch ($page) {
-    case 'login': $auth->showLogin(); break;
-    case 'register': $auth->showRegister(); break;
-    case 'login_post': $auth->login(); break;
-    case 'register_post': $auth->register(); break;
-    case 'logout': $auth->logout(); break;
-    case 'tasks': $tasks->index(); break;
-    case 'settings': $settings->index(); break;
-    case 'settings_save': $settings->save(); break;
-    case 'habits': $habits->index(); break;
-    // Add other cases as needed
+    
+    // --- AUTHENTICATION ---
+    case 'login': 
+        render('login'); 
+        break;
+    case 'register': 
+        render('register'); 
+        break;
+    case 'logout': 
+        auth_logout(); 
+        header('Location: ?page=login'); 
+        break;
+    case 'login_post': 
+        action_login($pdo); 
+        break;
+    case 'register_post': 
+        action_register($pdo); 
+        break;
+
+    // --- TASKS ---
+    case 'tasks':
+        auth_require(); // Must be logged in to see this
+        render('tasks', [
+            'tasks' => get_tasks($pdo, auth_user_id()),
+            'categories' => get_categories($pdo)
+        ]);
+        break;
+    case 'task_create': 
+        auth_require(); 
+        action_task_create($pdo, auth_user_id()); 
+        break;
+    case 'task_toggle': 
+        auth_require(); 
+        action_task_toggle($pdo, auth_user_id()); 
+        break;
+    case 'task_delete': 
+        auth_require(); 
+        action_task_delete($pdo, auth_user_id()); 
+        break;
+
+    // --- HABITS ---
+    case 'habits':
+        auth_require();
+        render('habits', [
+            'habits' => get_habits($pdo, auth_user_id())
+        ]);
+        break;
+    case 'habit_create': 
+        auth_require(); 
+        action_habit_create($pdo, auth_user_id()); 
+        break;
+    case 'habit_check': 
+        auth_require(); 
+        action_habit_check($pdo, auth_user_id()); 
+        break;
+
+    // --- SETTINGS ---
+    case 'settings':
+        auth_require();
+        $uid = auth_user_id();
+        
+        // Fetch user info
+        $st = $pdo->prepare("SELECT id, display_name, email FROM users WHERE id = ?");
+        $st->execute([$uid]);
+        $user = $st->fetch();
+        
+        // Fetch user settings
+        $st2 = $pdo->prepare("SELECT * FROM user_settings WHERE user_id = ?");
+        $st2->execute([$uid]);
+        $settings = $st2->fetch() ?: [];
+        
+        render('settings', ['user' => $user, 'settings' => $settings]);
+        break;
+    case 'settings_save': 
+        auth_require(); 
+        action_settings_save($pdo, auth_user_id()); 
+        break;
+
+    // --- SKILLS ---
+    case 'skills':
+        auth_require();
+        render('skills', [
+            'skills' => get_skills($pdo)
+        ]);
+        break;
+
+    // --- CATEGORIES ---
+    case 'categories':
+        auth_require();
+        render('categories', [
+            'categories' => get_categories($pdo)
+        ]);
+        break;
+
+    // --- PLANNER ---
+    case 'planner':
+        auth_require();
+        $date = $_GET['date'] ?? date('Y-m-d');
+        render('planner', [
+            'tasks' => get_tasks($pdo, auth_user_id(), $date),
+            'selectedDate' => $date
+        ]);
+        break;
+
+    // --- CALENDAR ---
+    case 'calendar':
+        auth_require();
+        render('calendar', [
+            'tasks' => get_tasks($pdo, auth_user_id())
+        ]);
+        break;
+    case 'calendar_export':
+        auth_require();
+        action_calendar_export($pdo, auth_user_id());
+        break;
+
+    // --- 404 NOT FOUND ---
     default:
         http_response_code(404);
         render('404');

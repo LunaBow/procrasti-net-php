@@ -1,16 +1,24 @@
-// Apply theme instantly
+/**
+ * app/src/assets/js/app.js
+ * Main JavaScript for Procrasti-net. Fun stuff
+ */
+
+// --- THEME MANAGEMENT ---
+// set the color theme before the page fully loads.
 (function() {
     var theme = localStorage.getItem('theme');
     if (theme) {
         if (theme === 'dark') {
-            document.documentElement.classList.add('pastel-mode');
+            document.documentElement.classList.add('pastel-mode'); // Our dark theme name
         } else if (theme !== 'light') {
             document.documentElement.classList.add(theme);
         }
     }
 })();
 
-// Leet Speak Converter
+/**
+ * Converts text to "Leet Speak" (e.g., 'a' becomes '4').
+ */
 function toLeetSpeak(text) {
     const leetMap = {
         'a': '4', 'e': '3', 'g': '6', 'i': '1', 'o': '0', 's': '5', 't': '7',
@@ -19,226 +27,170 @@ function toLeetSpeak(text) {
     return text.split('').map(char => leetMap[char] || char).join('');
 }
 
-// Apply visual settings based on body data attributes
+/**
+ * Applies special visual effects based on
+ * user settings stored in body data attributes.
+ */
 function applyClientFeatures() {
     const body = document.body;
 
-    // Hand-Drawn Mode
+    // Hand-Drawn Mode:
     if (body.dataset.handDrawnMode === 'true') {
         document.documentElement.classList.add('hand-drawn-mode');
     }
 
-    // Leet Speak
+    // Leet Speak: Converts all translated text into numbers.
     if (body.dataset.leetSpeak === 'true') {
         document.querySelectorAll('[data-lang]').forEach(el => {
             el.textContent = toLeetSpeak(el.textContent);
         });
     }
 
-    // Sarcastic Comments
+    // Sarcastic Comments: Shows a random mean message if tasks are overdue.
     if (body.dataset.sarcasticComments === 'true') {
-        const overdueTasks = document.querySelectorAll('.task-due-date.overdue');
-        if (overdueTasks.length > 0) {
-            const sarcasticMessages = [
-                "Wow, look at all those overdue tasks. You're a real go-getter.",
-                "Don't worry, those tasks will eventually do themselves. Or not.",
-                "I'm not saying you're a procrastinator, but I'm not not saying it either.",
-                "Are you trying to set a new record for overdue tasks?",
-                "If you keep it up, the world might end before you achieve what you set out to do. Takes a lot of pressure, huh?"
+        const hasOverdue = !!document.querySelector('.task-due-date.overdue'); // Check if any element has 'overdue' class
+        if (hasOverdue) {
+            const meanMessages = [
+                "Wow, another day of failing. Proud of you.",
+                "Your to-do list is more like a 'will-never-do' list.",
+                "Maybe if you spent less time here, you'd actually finish something.",
+                "I'm not mad, just disappointed. Actually, I'm a computer, I don't care."
             ];
-            const randomIndex = Math.floor(Math.random() * sarcasticMessages.length);
-            const message = sarcasticMessages[randomIndex];
-            const messageElement = document.createElement('p');
-            messageElement.textContent = message;
-            messageElement.style.textAlign = 'center';
-            messageElement.style.color = 'var(--accent)';
-            messageElement.style.fontWeight = 'bold';
-            document.querySelector('main').prepend(messageElement);
+            const msg = meanMessages[Math.floor(Math.random() * meanMessages.length)];
+            const el = document.createElement('p');
+            el.style = "text-align:center; color:var(--accent); font-weight:bold; margin: 1rem 0;";
+            el.textContent = msg;
+            document.querySelector('main')?.prepend(el);
         }
     }
 }
 
+// --- MAIN INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- LANGUAGE SWITCHER ---
+    // --- LANGUAGE SWITCHING ---
     const languageSelect = document.getElementById('language-select');
     
     function updateLanguage(lang) {
         const elements = document.querySelectorAll('[data-lang]');
         elements.forEach(el => {
             const key = el.getAttribute('data-lang');
-            if (languages[lang] && languages[lang][key]) {
+            // 'languages' variable comes from languages.js
+            if (typeof languages !== 'undefined' && languages[lang] && languages[lang][key]) {
                 el.textContent = languages[lang][key];
             }
         });
         localStorage.setItem('language', lang);
-        if (languageSelect) {
-            languageSelect.value = lang;
-        }
-        // Re-apply leet speak after language change
+        if (languageSelect) languageSelect.value = lang;
+        
+        // Re-apply leet speak if enabled
         if (document.body.dataset.leetSpeak === 'true') {
-            elements.forEach(el => {
-                el.textContent = toLeetSpeak(el.textContent);
-            });
+            elements.forEach(el => el.textContent = toLeetSpeak(el.textContent));
         }
     }
 
     if (languageSelect) {
-        languageSelect.addEventListener('change', (e) => {
-            updateLanguage(e.target.value);
-        });
+        languageSelect.addEventListener('change', (e) => updateLanguage(e.target.value));
     }
 
-    // Set initial language from storage
+    // Set initial language
     const savedLanguage = localStorage.getItem('language') || 'en';
     updateLanguage(savedLanguage);
 
-    // Apply features like Leet Speak, Hand-Drawn mode etc.
+    // Apply special settings (Hand-drawn, Leet, etc.)
     applyClientFeatures();
 
-    // --- TASK TOGGLING ---
-    const taskItems = document.querySelectorAll('li[data-id]');
-    taskItems.forEach(item => {
-        const toggleButton = item.querySelector('.toggleBtn');
-        if (toggleButton) {
-            toggleButton.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const taskId = item.dataset.id;
-                if (!taskId) return;
-
-                const formData = new FormData();
-                formData.append('id', taskId);
-                
-                const csrfToken = toggleButton.dataset.csrf;
-                if (csrfToken) {
-                    formData.append('csrf', csrfToken);
-                }
-
-                try {
-                    const response = await fetch('?page=task_toggle', {
-                        method: 'POST',
-                        body: formData,
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.status === 'done') {
-                            item.classList.add('done');
-                            toggleButton.textContent = '✅';
-                            const title = item.querySelector('.title');
-                            if (title) {
-                                title.style.textDecoration = 'line-through';
-                                title.style.color = 'var(--text-muted)';
-                            }
-                        } else {
-                            item.classList.remove('done');
-                            toggleButton.textContent = '⬜';
-                            const title = item.querySelector('.title');
-                            if (title) {
-                                title.style.textDecoration = 'none';
-                                title.style.color = 'var(--text)';
-                            }
-                        }
-                    } else {
-                        console.error('Server error toggling task.');
-                    }
-                } catch (error) {
-                    console.error('Network error:', error);
-                }
-            });
-        }
-    });
-
-    // --- HABIT CHECKING ---
-    const habitButtons = document.querySelectorAll('.habit-check-btn');
-    habitButtons.forEach(btn => {
-        btn.addEventListener('click', async (e) => {
+    // --- TASK MANAGEMENT (AJAX) ---
+    // AI Help: AJAX allows us to update the database without refreshing the whole page.
+    
+    // Toggle task status
+    document.querySelectorAll('.task-toggle-form').forEach(form => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const habitId = btn.dataset.id;
-            if (!habitId) return;
-
-            const formData = new FormData();
-            formData.append('id', habitId);
-            
-            const csrfToken = btn.dataset.csrf;
-            if (csrfToken) {
-                formData.append('csrf', csrfToken);
-            }
-            
-            const today = new Date().toLocaleDateString('en-CA');
-            formData.append('date', today);
-
             try {
-                const response = await fetch('?page=habit_check', {
-                    method: 'POST',
-                    body: formData,
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
-
+                const response = await fetch(form.action, { method: 'POST', body: new FormData(form) });
                 if (response.ok) {
                     const data = await response.json();
-                    if (data.success) {
-                        btn.textContent = 'Checked!';
-                        btn.style.background = 'var(--primary)';
-                        btn.style.color = 'white';
-                        btn.disabled = true;
-                        
-                        const streakEl = btn.closest('.card').querySelector('.streak strong');
-                        if (streakEl) {
-                            streakEl.textContent = parseInt(streakEl.textContent) + 1;
-                        }
+                    const item = form.closest('.task-item');
+                    const checkbox = form.querySelector('.task-checkbox');
+                    
+                    if (data.status === 'done') {
+                        item.classList.add('done');
+                        checkbox.textContent = '✅';
+                    } else {
+                        item.classList.remove('done');
+                        checkbox.textContent = '⬜';
                     }
+                    // 'updateStats' function should be defined in the view or here
+                    if (typeof updateStats === 'function') updateStats();
                 }
-            } catch (error) {
-                console.error('Failed to log habit:', error);
-            }
+            } catch (err) { console.error("Toggle failed", err); }
         });
     });
 
-    // --- THEME SWITCHER ---
+    // --- HABIT CHECKING (AJAX) ---
+    document.querySelectorAll('.habit-check-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const formData = new FormData();
+            formData.append('id', btn.dataset.id);
+            formData.append('csrf', btn.dataset.csrf);
+            formData.append('date', new Date().toLocaleDateString('en-CA')); // YYYY-MM-DD
+
+            try {
+                const response = await fetch('?page=habit_check', { 
+                    method: 'POST', 
+                    body: formData, 
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' } 
+                });
+                if (response.ok) {
+                    btn.textContent = 'Done!';
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    // Update streak count on screen
+                    const streakEl = btn.closest('.card').querySelector('.streak strong');
+                    if (streakEl) streakEl.textContent = parseInt(streakEl.textContent) + 1;
+                }
+            } catch (err) { console.error("Habit check failed", err); }
+        });
+    });
+
+    // --- THEME SWITCHING ---
     const themeSwitcher = document.getElementById('theme-select');
     if (themeSwitcher) {
-        var theme = localStorage.getItem('theme') || 'light';
-        themeSwitcher.value = theme;
-
+        themeSwitcher.value = localStorage.getItem('theme') || 'light';
         themeSwitcher.addEventListener('change', (e) => {
+            const newTheme = e.target.value;
+            // Remove all possible theme classes
             document.documentElement.classList.remove('pastel-mode', 'blue-theme', 'green-theme', 'purple-theme', 'pink-theme', 'orange-theme');
-            const selectedTheme = e.target.value;
-            if (selectedTheme === 'dark') {
+            
+            if (newTheme === 'dark') {
                 document.documentElement.classList.add('pastel-mode');
-            } else if (selectedTheme !== 'light') {
-                document.documentElement.classList.add(selectedTheme);
+            } else if (newTheme !== 'light') {
+                document.documentElement.classList.add(newTheme);
             }
-            localStorage.setItem('theme', selectedTheme);
+            localStorage.setItem('theme', newTheme);
         });
     }
 
     // --- SKILLS FILTERING ---
-    const categorySelect = document.getElementById('skill-category-select');
-    const searchInput = document.getElementById('skill-search-input');
+    const skillCategory = document.getElementById('skill-category-select');
+    const skillSearch = document.getElementById('skill-search-input');
     const skillCards = document.querySelectorAll('.skill-card-item');
 
     function filterSkills() {
-        if (!categorySelect || !searchInput) return;
-        
-        const category = categorySelect.value.toLowerCase();
-        const search = searchInput.value.toLowerCase();
+        if (!skillCategory || !skillSearch) return;
+        const cat = skillCategory.value.toLowerCase();
+        const term = skillSearch.value.toLowerCase();
 
         skillCards.forEach(card => {
-            const cardCategory = (card.dataset.category || '').toLowerCase();
+            const cardCat = (card.dataset.category || '').toLowerCase();
             const cardName = (card.dataset.name || '').toLowerCase();
-            const matchesCategory = category === '' || cardCategory === category;
-            const matchesSearch = search === '' || cardName.includes(search);
-
-            if (matchesCategory && matchesSearch) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
+            const matchesCat = cat === '' || cardCat === cat;
+            const matchesTerm = term === '' || cardName.includes(term);
+            card.style.display = (matchesCat && matchesTerm) ? 'block' : 'none';
         });
     }
 
-    if (categorySelect) categorySelect.addEventListener('change', filterSkills);
-    if (searchInput) searchInput.addEventListener('input', filterSkills);
+    skillCategory?.addEventListener('change', filterSkills);
+    skillSearch?.addEventListener('input', filterSkills);
 });

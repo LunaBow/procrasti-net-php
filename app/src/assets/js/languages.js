@@ -1,3 +1,8 @@
+/**
+ * app/src/assets/js/languages.js
+ * Dictionary for multi-language support (English and German).
+ * Used by app.js to translate elements with [data-lang] attributes.
+ */
 const languages = {
     en: {
         // Header

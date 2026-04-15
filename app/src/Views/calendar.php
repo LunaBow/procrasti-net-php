@@ -1,7 +1,8 @@
 <?php 
-$title = 'Calendar Export - Procrasti-php'; 
+// app/src/Views/calendar.php - Calendar export and view
+$title = 'Calendar Export'; 
 
-// Generate Calendar logic
+// AI Help: DateTime is a powerful class in PHP to handle dates and times.
 $now = new DateTime();
 $currentMonth = (int)$now->format('n');
 $currentYear = (int)$now->format('Y');
@@ -24,6 +25,7 @@ for ($i = 1; $i <= $daysInMonth; $i++) {
 <div class="content panel" style="margin: 0 1.5rem; max-width: none;">
     <h2 style="font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: -1px; color: var(--primary); margin-top: 0; margin-bottom: 2rem;">Calendar Export</h2>
 
+    <!-- Form to export tasks as an .ics file -->
     <form class="export-box" method="get" action="index.php" style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end; padding: 1.5rem; background: rgba(0, 0, 0, 0.2); border: 1px dashed var(--border); border-radius: var(--radius-md); margin-bottom: 2rem;">
         <input type="hidden" name="page" value="calendar_export">
         
@@ -42,14 +44,15 @@ for ($i = 1; $i <= $daysInMonth; $i++) {
         </button>
     </form>
 
+    <!-- Visual Calendar -->
     <div class="calendar-container">
         <h3 style="font-family: 'JetBrains Mono', monospace; color: var(--text); text-transform: uppercase; margin-bottom: 1rem; font-size: 1.2rem;">
             <?= $now->format('F Y') ?>
         </h3>
         <div class="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border);">
-            <?php foreach (['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $d): ?>
+            <?php foreach (['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $dayName): ?>
                 <div class="day-name" style="background: rgba(0, 0, 0, 0.4); padding: 0.5rem; text-align: center; font-size: 0.7rem; font-weight: 900; color: var(--primary); text-transform: uppercase;">
-                    <?= $d ?>
+                    <?= $dayName ?>
                 </div>
             <?php endforeach; ?>
 
