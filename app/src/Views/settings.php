@@ -23,7 +23,7 @@
         <div class="field" style="text-align: left; margin-bottom: 2rem;">
             <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Email</label>
             <input type="text" value="<?= e($user['email'] ?? '') ?>" class="item" style="width: 100%; box-sizing: border-box; opacity: 0.6; cursor: not-allowed;" disabled>
-            <p class="muted" style="font-size: 0.8rem; margin-top: 0.5rem;">Can't change this yet. sooowwyyy.</p>
+            <p class="muted" style="font-size: 0.8rem; margin-top: 0.5rem;">Can't change this. sooowwyyy.</p>
         </div>
 
         <h3 style="color: var(--text); border-bottom: 1px dashed var(--border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Features</h3>
@@ -64,7 +64,7 @@
             <input type="checkbox" name="leet_speak" id="leet_speak" <?= ($settings['leet_speak'] ?? 0) ? 'checked' : '' ?> style="margin-top: 0.3rem;">
             <label for="leet_speak" style="cursor: pointer;">
                 <strong style="display: block;">1337 5P34K</strong>
-                <span class="muted" style="font-size: 0.85rem; font-weight: normal;">7URN5 411 73X7 1N70 1337 5P34K. Y0U W111 R36R37 7H15.</span>
+                <span class="muted" style="font-size: 0.85rem; font-weight: normal;">7URN5 411 73X7 1N70 1337 5P34K. Y0U W111 N07 R36R37 7H15.</span>
             </label>
         </div>
         

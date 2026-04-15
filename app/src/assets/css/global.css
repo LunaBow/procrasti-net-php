@@ -52,6 +52,86 @@ html.pastel-mode {
   --shadow-lg: 0 12px 32px rgba(0,0,0,0.4);
 }
 
+html.blue-theme {
+  --bg: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+  --surface: #ffffff;
+  --surface-alt: #f1f8ff;
+  --primary: #1976d2;
+  --primary-hover: #1565c0;
+  --accent: #03dac6;
+  --accent-hover: #00bfa5;
+  --text: #0d47a1;
+  --text-muted: #546e7a;
+  --border: #bbdefb;
+  --shadow-sm: 0 2px 4px rgba(25,118,210,0.1);
+  --shadow-md: 0 4px 12px rgba(25,118,210,0.15);
+  --shadow-lg: 0 12px 32px rgba(25,118,210,0.2);
+}
+
+html.green-theme {
+  --bg: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+  --surface: #ffffff;
+  --surface-alt: #f1f8e9;
+  --primary: #388e3c;
+  --primary-hover: #2e7d32;
+  --accent: #ff9800;
+  --accent-hover: #f57c00;
+  --text: #1b5e20;
+  --text-muted: #558b2f;
+  --border: #c8e6c9;
+  --shadow-sm: 0 2px 4px rgba(56,142,60,0.1);
+  --shadow-md: 0 4px 12px rgba(56,142,60,0.15);
+  --shadow-lg: 0 12px 32px rgba(56,142,60,0.2);
+}
+
+html.purple-theme {
+  --bg: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  --surface: #ffffff;
+  --surface-alt: #faf0ff;
+  --primary: #7b1fa2;
+  --primary-hover: #6a1b9a;
+  --accent: #ff4081;
+  --accent-hover: #f50057;
+  --text: #4a148c;
+  --text-muted: #7b1fa2;
+  --border: #e1bee7;
+  --shadow-sm: 0 2px 4px rgba(123,31,162,0.1);
+  --shadow-md: 0 4px 12px rgba(123,31,162,0.15);
+  --shadow-lg: 0 12px 32px rgba(123,31,162,0.2);
+}
+
+html.pink-theme {
+  --bg: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+  --surface: #ffffff;
+  --surface-alt: #fff0f5;
+  --primary: #c2185b;
+  --primary-hover: #ad1457;
+  --accent: #ffb300;
+  --accent-hover: #ffa000;
+  --text: #880e4f;
+  --text-muted: #ad1457;
+  --border: #f8bbd0;
+  --shadow-sm: 0 2px 4px rgba(194,24,91,0.1);
+  --shadow-md: 0 4px 12px rgba(194,24,91,0.15);
+  --shadow-lg: 0 12px 32px rgba(194,24,91,0.2);
+}
+
+html.orange-theme {
+  --bg: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  --surface: #ffffff;
+  --surface-alt: #fff8e1;
+  --primary: #f57c00;
+  --primary-hover: #ef6c00;
+  --accent: #00acc1;
+  --accent-hover: #0097a7;
+  --text: #e65100;
+  --text-muted: #f57c00;
+  --border: #ffe0b2;
+  --shadow-sm: 0 2px 4px rgba(245,124,0,0.1);
+  --shadow-md: 0 4px 12px rgba(245,124,0,0.15);
+  --shadow-lg: 0 12px 32px rgba(245,124,0,0.2);
+}
+
 /* Hand-Drawn Mode Variables */
 html.hand-drawn-mode {
     --font-ui: 'Architects Daughter', cursive;
@@ -96,7 +176,7 @@ a:hover {
 
 /* Hand-Drawn Specific Tweaks */
 html.hand-drawn-mode .nav-core,
-html.hand-drawn-mode .nav-extra,
+html.hand-drawn-mode .nav-extra-menu,
 html.hand-drawn-mode .card,
 html.hand-drawn-mode .content,
 html.hand-drawn-mode input,
@@ -205,21 +285,44 @@ header h2 {
 
 .nav-stack {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  justify-content: center;
   align-items: center;
 }
 
-.nav-core, .nav-extra {
+.nav-core {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
-  background: var(--surface);
-  padding: 0.5rem;
-  border-radius: 999px;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
+  padding: 1rem 2rem;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.nav-extra-menu {
+  position: fixed;
+  top: 0;
+  right: -260px;
+  width: 280px;
+  height: 100vh;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: right 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.nav-extra-menu:hover {
+  right: 0;
 }
 
 .dropdown-wrapper {
@@ -327,7 +430,7 @@ header h2 {
     margin-top: 1rem;
 }
 
-#language-switcher select {
+#language-switcher select, #theme-switcher select {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -341,7 +444,7 @@ header h2 {
     transition: all 0.2s ease;
 }
 
-#language-switcher select:hover {
+#language-switcher select:hover, #theme-switcher select:hover {
     background: var(--surface-alt);
     border-color: var(--primary);
 }

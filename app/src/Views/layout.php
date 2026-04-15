@@ -1,5 +1,5 @@
 <?php
-$title = $title ?? 'Procrasti-php';
+$title = $title ?? 'Procrastinate-php';
 $globalSettings = $globalSettings ?? [];
 ?>
 <!doctype html>
@@ -11,11 +11,16 @@ $globalSettings = $globalSettings ?? [];
     <!-- Use relative paths or dynamically echo the correct base path -->
     <link rel="stylesheet" href="../src/assets/css/global.css">
     
-    <!-- Apply theme early to prevent flashbang -->
+    <!-- Apply theme early to prevent flash of unstyled content -->
     <script>
         (function() {
-            if (localStorage.getItem('theme') === 'dark') {
-                document.documentElement.classList.add('pastel-mode');
+            const theme = localStorage.getItem('theme');
+            if (theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('pastel-mode');
+                } else if (theme !== 'light') {
+                    document.documentElement.classList.add(theme);
+                }
             }
         })();
     </script>
@@ -28,14 +33,19 @@ $globalSettings = $globalSettings ?? [];
 <div id="entireContentWrapper">
     <header id="headerHeading">
         <div class="container">
-            <h1><a href="?page=tasks" data-lang="header-title">procrasti-net</a></h1>
+            <h1><a href="?page=tasks" data-lang="header-title">procrastinate-net</a></h1>
             <h2 data-lang="header-subtitle">Fuck it, we ball.</h2>
             <div id="controls">
                 <div id="theme-switcher">
-                    <label class="switch" aria-label="Toggle theme">
-                        <input type="checkbox" id="theme-switcher-checkbox">
-                        <span class="slider round"></span>
-                    </label>
+                    <select id="theme-select" aria-label="Select theme" style="-webkit-appearance: none; -moz-appearance: none; appearance: none; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 0.5rem 1rem; font-weight: 600; color: var(--text); cursor: pointer; transition: all 0.2s ease;">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="blue-theme">Blue</option>
+                        <option value="green-theme">Green</option>
+                        <option value="purple-theme">Purple</option>
+                        <option value="pink-theme">Pink</option>
+                        <option value="orange-theme">Orange</option>
+                    </select>
                 </div>
                 <div id="language-switcher">
                     <select id="language-select">
@@ -63,29 +73,39 @@ $globalSettings = $globalSettings ?? [];
                     <div class="dropdown-wrapper"><a href="?page=login" style="color: var(--primary);" data-lang="nav-login">Login</a></div>
                 <?php endif; ?>
             </nav>
-
-            <!-- Row 2: old stuff from other frontend yippie -->
-            <nav class="nav-extra" aria-label="Extra navigation">
-                <div class="dropdown-wrapper">
-                    <a id="triggerEvaluation" class="dropbtn" href="#" data-lang="nav-reality-check">Reality Check</a>
-                    <div class="dropdown-content">
-                        <a id="triggerRequired" href="#" data-lang="nav-bare-minimum">Bare Minimum Tasks</a>
-                        <a id="triggerBoot" href="#" data-lang="nav-emergency-reboot">Emergency Reboot</a>
-                    </div>
-                </div>
-                <div class="dropdown-wrapper">
-                    <a id="triggerArt" class="dropbtn" href="#" data-lang="nav-dissociation-arcade">Dissociation Arcade</a>
-                    <div class="dropdown-content">
-                        <a id="showDrawingsOnly" href="#" data-lang="nav-visual-gallery">Visual Gallery</a>
-                        <a id="showAVOnly" href="#" data-lang="nav-multimedia">Multimedia</a>
-                        <a id="showBooksOnly" href="#" data-lang="nav-literary-collection">Literary Collection</a>
-                    </div>
-                </div>
-                <div class="dropdown-wrapper">
-                    <a id="TriggerMember" class="dropbtn" href="#" data-lang="nav-the-gang">The Gang (sheesh)</a>
-                </div>
-            </nav>
         </div>
+
+        <!-- Extra Navigation Slide-out Menu -->
+        <nav class="nav-extra-menu" aria-label="Extra navigation">
+            <div class="dropdown-wrapper">
+                <a id="triggerConnections" class="dropbtn" href="#" data-lang="nav-my-connections">My Connections</a>
+                <div class="dropdown-content">
+                    <a href="https://www.youtube.com/@LunarBower" data-lang="nav-youtube-lunarbower">YouTube @LunarBower</a>
+                    <a href="https://www.threads.com/@luna_tic_tic_boom" data-lang="nav-threads-lunartic">Threads @luna_tic_tic_boom</a>
+                    <a href="https://www.instagram.com/luna_tic_tic_boom/" data-lang="nav-instagram-lunartic">Instagram @luna_tic_tic_boom</a>
+                    <a href="https://github.com/LunaBow" data-lang="nav-github-lunabow">GitHub LunaBow</a>
+                    <a href="https://open.spotify.com/artist/2rWHud9CFPTzoDgCKh0t4S" data-lang="nav-spotify-lunarbower">Spotify Lunar Bower</a>
+                </div>
+            </div>
+            <div class="dropdown-wrapper">
+                <a id="triggerDistractions" class="dropbtn" href="#" data-lang="nav-distractions">Distractions</a>
+                <div class="dropdown-content">
+                    <a href="https://www.newgrounds.com/" data-lang="nav-newgrounds-games">Newgrounds Games</a>
+                    <a href="https://www.deviantart.com/" data-lang="nav-deviantart-gallery">DeviantArt Gallery</a>
+                    <a href="https://www.youtube.com/" data-lang="nav-youtube-videos">YouTube Videos</a>
+                    <a href="https://www.reddit.com/" data-lang="nav-reddit-community">Reddit Community</a>
+                </div>
+            </div>
+            <div class="dropdown-wrapper">
+                <a id="triggerResources" class="dropbtn" href="#" data-lang="nav-resources">Resources</a>
+                <div class="dropdown-content">
+                    <a href="https://www.mindtools.com/pages/main/newMN_80.htm" data-lang="nav-mindtools-reality-check">MindTools Reality Check</a>
+                    <a href="https://www.productivityist.com/bare-minimum-tasks/" data-lang="nav-productivityist-bare-minimum">Productivityist Bare Minimum</a>
+                    <a href="https://www.headspace.com/" data-lang="nav-headspace-mindfulness">Headspace Mindfulness</a>
+                    <a href="https://www.gutenberg.org/" data-lang="nav-gutenberg-books">Project Gutenberg Books</a>
+                </div>
+            </div>
+        </nav>
     </section>
 
     <div id="JoinContent" style="display: block;">
@@ -96,7 +116,11 @@ $globalSettings = $globalSettings ?? [];
                 </div>
             <?php endif; ?>
             
-            <?php include $content; ?>
+            <?php if (isset($content) && file_exists($content)): ?>
+                <?php include $content; ?>
+            <?php else: ?>
+                <p>Content not available.</p>
+            <?php endif; ?>
         </main>
     </div>
 
@@ -104,7 +128,7 @@ $globalSettings = $globalSettings ?? [];
         <footer>
             <div class="footer-site-footercontainer">
                 <div class="footer-about">
-                    <p><strong data-lang="footer-about-title">Procrasti-net</strong></p>
+                    <p><strong data-lang="footer-about-title">Procrastinate-net</strong></p>
                     <p data-lang="footer-about-p1">We're here to do tasks and chew bubblegum. And we have a lot of bubble gum.</p>
                     <p data-lang="footer-about-p2">Build for Luna and Verena, may they stop procrastinating and start working on shit.</p>
                 </div>

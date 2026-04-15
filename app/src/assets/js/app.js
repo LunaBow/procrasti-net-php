@@ -1,7 +1,12 @@
 // Apply theme instantly
 (function() {
-    if (localStorage.getItem('theme') === 'dark') {
-        document.documentElement.classList.add('pastel-mode');
+    var theme = localStorage.getItem('theme');
+    if (theme) {
+        if (theme === 'dark') {
+            document.documentElement.classList.add('pastel-mode');
+        } else if (theme !== 'light') {
+            document.documentElement.classList.add(theme);
+        }
     }
 })();
 
@@ -39,6 +44,7 @@ function applyClientFeatures() {
                 "Don't worry, those tasks will eventually do themselves. Or not.",
                 "I'm not saying you're a procrastinator, but I'm not not saying it either.",
                 "Are you trying to set a new record for overdue tasks?",
+                "If you keep it up, the world might end before you achieve what you set out to do. Takes a lot of pressure, huh?"
             ];
             const randomIndex = Math.floor(Math.random() * sarcasticMessages.length);
             const message = sarcasticMessages[randomIndex];
@@ -191,20 +197,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- THEME SWITCHER ---
-    const themeSwitcher = document.getElementById('theme-switcher-checkbox');
+    const themeSwitcher = document.getElementById('theme-select');
     if (themeSwitcher) {
-        if (localStorage.getItem('theme') === 'dark') {
-            themeSwitcher.checked = true;
-        }
+        var theme = localStorage.getItem('theme') || 'light';
+        themeSwitcher.value = theme;
 
-        themeSwitcher.addEventListener('change', () => {
-            if (themeSwitcher.checked) {
+        themeSwitcher.addEventListener('change', (e) => {
+            document.documentElement.classList.remove('pastel-mode', 'blue-theme', 'green-theme', 'purple-theme', 'pink-theme', 'orange-theme');
+            const selectedTheme = e.target.value;
+            if (selectedTheme === 'dark') {
                 document.documentElement.classList.add('pastel-mode');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.classList.remove('pastel-mode');
-                localStorage.setItem('theme', 'light');
+            } else if (selectedTheme !== 'light') {
+                document.documentElement.classList.add(selectedTheme);
             }
+            localStorage.setItem('theme', selectedTheme);
         });
     }
 
