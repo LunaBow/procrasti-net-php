@@ -80,7 +80,7 @@ $totalCount = count($tasks);
         <div class="task-form-row">
             <div class="field field-title">
                 <label>Task Title</label>
-                <input type="text" name="title" placeholder="e.g. Open the document..." required>
+                <input type="text" name="title1" placeholder="e.g. Open the document..." required>
             </div>
             <div class="field field-category">
                 <label>Category</label>

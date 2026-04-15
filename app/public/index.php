@@ -26,6 +26,10 @@ use Repos\SkillRepo;
 use Repos\HabitRepo;
 use Repos\SettingsRepo;
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 // Pulling in my DB secrets from outside the public folder (security first!)
 $envFile = __DIR__ . '/../../.env.php';
 if (!file_exists($envFile)) {
@@ -33,6 +37,7 @@ if (!file_exists($envFile)) {
     $config = [
         'db' => [
             'host' => $_ENV['DB_HOST'] ?? 'localhost',
+            'port' => $_ENV['DB_PORT'] ?? '3306',
             'name' => $_ENV['DB_NAME'] ?? 'procrasti_net',
             'user' => $_ENV['DB_USER'] ?? 'root',
             'pass' => $_ENV['DB_PASS'] ?? '',
